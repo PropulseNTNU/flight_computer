@@ -3,10 +3,12 @@
     1. Setting up serial and i2c communication
     2. Setting up the BME280 altitude sensor and printing the desired sensor information
 */
-
 #include <Wire.h>
+#include <SPI.h>
 #include "src/LED/LED.h"
 #include "src/BME280/SparkFunBME280.h"
+//#include "src/SD-1.2.3/src/SD.h"
+#include "src/Adafruit_BNO055/Adafruit_BNO055.h"
 
 //Setting up objects and params
 BME280 Bme;
@@ -37,6 +39,9 @@ void loop()
 {
 
   Bme.printSensorInformation(true,true,true,false);
+  Serial.println(Bme.readFloatAltitudeMeters());
+  //readTempC()
+  //readFloatPressur()
 
   delay(100);
 }
