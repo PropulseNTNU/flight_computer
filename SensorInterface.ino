@@ -1,7 +1,10 @@
 /*
   This arduino program is currently doing the following:
-    1. Setting up serial and i2c communication
-    2. Setting up the BME280 altitude sensor and printing the desired sensor information
+    1. Initializing sensor objects and log file.
+    2. Setting up serial and i2c communication with sensors and SD.
+    3. Setting up the BME280 altitude sensor.
+    4. Setting up the BO055 IMU sensor
+    5. Logging the sensor data to the text file on the SD Card.
 */
 
 #include <Wire.h>
@@ -13,27 +16,49 @@
 
 //Setting up objects and params
 BME280 Bme;
+Adafruit_BNO055 IMU = Adafruit_BNO055(100, 0x28);
+
 int const diode = 13;
 uint8_t const SD_cspin = BUILTIN_SDCARD;
 File myFile;
 String DataFile = "Datafile.txt";
-struct SensorData {
-  float temp;
+
+
+struct SensorData
+ {
+  float bme_temp;
+  float IMU_temp;
   float pressure;
   float altitude;
+  double acc_x;
+  double acc_y;
+  double acc_z;
+  double pitch;
+  double roll;
+  double yaw;
+  double mag_x;
+  double mag_y;
+  double mag_z;
+  
 };
 
 void setup()
 {
   //Setup serial connection
   Serial.begin(9600);
-  
+ 
   //Start I2C
   Wire.begin();
-
-  //Starting communication with BME280 using I2C
-  Serial.println("Reading basic values from BME280");
+  
+  Serial.println("Starting I2C communication with BME280");
   if (!Bme.beginI2C())
+  {
+    Serial.println("The BME sensor did not respond. Please check wiring.");
+    while(1); //Freeze
+  }
+
+  Serial.println("Starting I2C communication with IMU");
+  if (!IMU.begin())
   {
     Serial.println("The sensor did not respond. Please check wiring.");
     while(1); //Freeze
@@ -52,7 +77,7 @@ void setup()
     
   }
 
-  //Successfull setup lights diode
+  //Successfull setup -> lights diode
   LEDConfig(diode);
   LEDSetMode(diode, HIGH);
 
@@ -77,9 +102,34 @@ void loop()
 { 
   //init data struct
   SensorData data;
-  data.temp = Bme.readTempC();
+
+  //Update BMP280 sensor data
+  data.bme_temp = Bme.readTempC();
   data.pressure = Bme.readFloatPressure();
   data.altitude = Bme.readFloatAltitudeMeters();
+
+  //Create IMU sensor event(Do measurements)
+  sensors_event_t event; 
+  IMU.getEvent(&event);
+  
+  //Acceleration in m/s^2
+  data.acc_x = event.acceleration.x;
+  data.acc_y = event.acceleration.y;
+  data.acc_z = event.acceleration.z;
+
+  //Rotation in deg
+  data.pitch = event.orientation.pitch;
+  data.roll = event.orientation.roll;
+  data.yaw = event.orientation.heading;
+
+  //Temp IMU deg
+  data.IMU_temp = event.temperature;
+
+  //Magnetic vector values in uT
+  data.mag_x = event.magnetic.x;
+  data.mag_y = event.magnetic.y;
+  data.mag_z = event.magnetic.z;
+  
   
   //Writing to SD card
   myFile = SD.open("Datafile.txt", FILE_WRITE);
@@ -90,17 +140,41 @@ void loop()
     Serial.println("Error opening file");
   }
   myFile.close();
-  
-  Bme.printSensorInformation(true,true,true,false);
-  delay(100);
+
+  //Uncomment this line when running system
+  //delay(BNO055_SAMPLERATE_DELAY_MS);
+
+  delay(200);
 }
 
 String createDataString(SensorData data){
   String dataString = "";
-  dataString += String(data.temp);
+  
+  dataString += String(data.bme_temp);
+  dataString += ",";
+  dataString += String(data.IMU_temp);
   dataString += ",";
   dataString += String(data.pressure);
   dataString += ",";
   dataString += String(data.altitude);
+  dataString += ",";
+  dataString += String(data.acc_x);
+  dataString += ",";
+  dataString += String(data.acc_y);
+  dataString += ",";
+  dataString += String(data.acc_z);
+  dataString += ",";
+  dataString += String(data.pitch);
+  dataString += ",";
+  dataString += String(data.roll);
+  dataString += ",";
+  dataString += String(data.yaw);
+  dataString += ",";
+  dataString += String(data.mag_x);
+  dataString += ",";
+  dataString += String(data.mag_y);
+  dataString += ",";
+  dataString += String(data.mag_z);
+  
   return dataString;
 }
