@@ -3,7 +3,7 @@
     1. Initializing sensor objects and log file.
     2. Setting up serial and i2c communication with sensors and SD.
     3. Setting up the BME280 altitude sensor.
-    4. Setting up the BO055 IMU sensor
+    4. Setting up the BNO055 IMU sensor
     5. Logging the sensor data to the text file on the SD Card.
 */
 
@@ -23,7 +23,7 @@ uint8_t const SD_cspin = BUILTIN_SDCARD;
 File dataFile;
 String DataFile = "Datafile.txt";
 
-
+/*
 struct SensorData
  {
   int timestamp;
@@ -41,10 +41,17 @@ struct SensorData
   double mag_y;
   double mag_z;
 };
+*/
+
+enum datatype {TIMESTAMP, BME_TEMP, IMU_TEMP, 
+                  PRESSURE, ALTITUDE, 
+                  ACC_X, ACC_Y, ACC_Z, 
+                  PITCH, ROLL, YAW, 
+                  MAG_X, MAG_Y, MAG_Z, NUM_TYPES};
 
 //init data struct
-SensorData data;
-
+//SensorData data;
+double data[NUM_TYPES];
 
 void setup()
 {
@@ -106,34 +113,34 @@ void loop()
 { 
 
   //Update BMP280 sensor data
-  data.bme_temp = Bme.readTempC();
-  data.pressure = Bme.readFloatPressure();
-  data.altitude = Bme.readFloatAltitudeMeters();
+  data[BME_TEMP] = Bme.readTempC();
+  data[PRESSURE] = Bme.readFloatPressure();
+  data[ALTITUDE] = Bme.readFloatAltitudeMeters();
 
   //Create IMU sensor event
   sensors_event_t event; 
   IMU.getEvent(&event);
   
   //Extract sensor fused orientation
-  data.pitch = event.orientation.pitch;
-  data.roll = event.orientation.roll;
-  data.yaw = event.orientation.heading;
-  data.timestamp = event.timestamp;
+  data[PITCH] = event.orientation.pitch;
+  data[ROLL] = event.orientation.roll;
+  data[YAW] = event.orientation.heading;
+  data[TIMESTAMP]= event.timestamp;
 
   //Temp IMU deg
-  data.IMU_temp = event.temperature;
+  data[IMU_TEMP] = event.temperature;
 
   //Extract "raw" Acceleration in m/s^2
   imu::Vector<3> accel = IMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-  data.acc_x = accel.x();
-  data.acc_y = accel.y();
-  data.acc_z = accel.z();
+  data[ACC_X] = accel.x();
+  data[ACC_Y] = accel.y();
+  data[ACC_Z] = accel.z();
   
   //Extract "raw" magnetometer in uT
   imu::Vector<3> mag = IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-  data.mag_x = mag.x();
-  data.mag_y = mag.y();
-  data.mag_z = mag.z();
+  data[MAG_X] = mag.x();
+  data[MAG_Y] = mag.y();
+  data[MAG_Z] = mag.z();
   
   //Writing to SD card
   dataFile = SD.open("Datafile.txt", FILE_WRITE);
@@ -146,13 +153,23 @@ void loop()
   dataFile.close();
 
   delay(500);
-
   
-  Serial.println(data.mag_x);
   
 }
 
-String createDataString(SensorData data){
+String createDataString(double data[NUM_TYPES]){
+  String dataString = "";
+
+  for (int i = 0; i < NUM_TYPES; i++){
+    dataString += String(data[i]);
+    dataString += ",";
+  }
+
+  return dataString;
+}
+
+
+/*String createDataString(SensorData data){
   String dataString = "";
 
   dataString += String(data.timestamp);
@@ -185,3 +202,4 @@ String createDataString(SensorData data){
 
   return dataString;
 }
+*/
