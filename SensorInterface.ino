@@ -20,12 +20,13 @@ Adafruit_BNO055 IMU = Adafruit_BNO055(100, 0x28);
 
 int const diode = 13;
 uint8_t const SD_cspin = BUILTIN_SDCARD;
-File myFile;
+File dataFile;
 String DataFile = "Datafile.txt";
 
 
 struct SensorData
  {
+  int timestamp;
   float bme_temp;
   float IMU_temp;
   float pressure;
@@ -39,8 +40,11 @@ struct SensorData
   double mag_x;
   double mag_y;
   double mag_z;
-  
 };
+
+//init data struct
+SensorData data;
+
 
 void setup()
 {
@@ -100,56 +104,59 @@ void setup()
 
 void loop()
 { 
-  //init data struct
-  SensorData data;
 
   //Update BMP280 sensor data
   data.bme_temp = Bme.readTempC();
   data.pressure = Bme.readFloatPressure();
   data.altitude = Bme.readFloatAltitudeMeters();
 
-  //Create IMU sensor event(Do measurements)
+  //Create IMU sensor event
   sensors_event_t event; 
   IMU.getEvent(&event);
   
-  //Acceleration in m/s^2
-  data.acc_x = event.acceleration.x;
-  data.acc_y = event.acceleration.y;
-  data.acc_z = event.acceleration.z;
-
-  //Rotation in deg
+  //Extract sensor fused orientation
   data.pitch = event.orientation.pitch;
   data.roll = event.orientation.roll;
   data.yaw = event.orientation.heading;
+  data.timestamp = event.timestamp;
 
   //Temp IMU deg
   data.IMU_temp = event.temperature;
 
-  //Magnetic vector values in uT
-  data.mag_x = event.magnetic.x;
-  data.mag_y = event.magnetic.y;
-  data.mag_z = event.magnetic.z;
+  //Extract "raw" Acceleration in m/s^2
+  imu::Vector<3> accel = IMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  data.acc_x = accel.x();
+  data.acc_y = accel.y();
+  data.acc_z = accel.z();
   
+  //Extract "raw" magnetometer in uT
+  imu::Vector<3> mag = IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+  data.mag_x = mag.x();
+  data.mag_y = mag.y();
+  data.mag_z = mag.z();
   
   //Writing to SD card
-  myFile = SD.open("Datafile.txt", FILE_WRITE);
-  if (myFile) {
-    myFile.println(createDataString(data));
+  dataFile = SD.open("Datafile.txt", FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(createDataString(data));
   }
   else {
     Serial.println("Error opening file");
   }
-  myFile.close();
+  dataFile.close();
 
-  //Uncomment this line when running system
-  //delay(BNO055_SAMPLERATE_DELAY_MS);
+  delay(500);
 
-  delay(200);
+  
+  Serial.println(data.mag_x);
+  
 }
 
 String createDataString(SensorData data){
   String dataString = "";
-  
+
+  dataString += String(data.timestamp);
+  dataString += ",";
   dataString += String(data.bme_temp);
   dataString += ",";
   dataString += String(data.IMU_temp);
@@ -175,6 +182,6 @@ String createDataString(SensorData data){
   dataString += String(data.mag_y);
   dataString += ",";
   dataString += String(data.mag_z);
-  
+
   return dataString;
 }
