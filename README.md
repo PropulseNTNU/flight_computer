@@ -54,4 +54,4 @@ under src/FSM inside the states.h file(The previous state inside the enum state)
 
 * **Kevin Kaldvansvik** - *Initial work* - [Kevinkald](https://github.com/Kevinkald)
 
-See also the list of [contributors](https://github.com/Propulse/NTNU/Flight-computer/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/PropulseNTNU/Flight-Computer/graphs/contributors) who participated in this project.
