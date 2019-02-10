@@ -23,9 +23,9 @@ Teensyduino - https://www.pjrc.com/teensy/td_download.html
 
 ### Hardware
 
-16 GB SDHC card
-BMP280 pressure sensor
-BNO055 IMU
+16 GB SDHC card.
+BMP280 pressure sensor.
+BNO055 IMU.
 
 ## Running the code on the Teensy 3.6
 
