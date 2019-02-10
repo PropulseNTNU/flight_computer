@@ -1,56 +1,68 @@
 /*
   This arduino program is currently doing the following:
     1. Initializing sensor objects and log file.
-    2. Setting up serial and i2c communication with sensors and SD.
+    2. Setting up serial and i2c communication with sensors and SD card.
     3. Setting up the BME280 altitude sensor.
-    4. Setting up the BNO055 IMU sensor
+    4. Setting up the BNO055 IMU sensor.
     5. Logging the sensor data to the text file on the SD Card.
+    6. Running the Finite State Machine.
 */
 
 #include <Wire.h>
-#include <SPI.h>
+//#include <SPI.h>
 #include <SD.h>
 #include "src/LED/LED.h"
 #include "src/BME280/SparkFunBME280.h"
 #include "src/Adafruit_BNO055/Adafruit_BNO055.h"
+#include "src/FSM/states.h"
+#include "src/FSM/transitions.h"
 
-//Setting up objects and params
-BME280 Bme;
-Adafruit_BNO055 IMU = Adafruit_BNO055(100, 0x28);
-
-int const diode = 13;
-uint8_t const SD_cspin = BUILTIN_SDCARD;
-File dataFile;
-String DataFile = "Datafile.txt";
+//Adresses
+const int IMU_ADDRESS = 0x28;
 
 /*
-struct SensorData
- {
-  int timestamp;
-  float bme_temp;
-  float IMU_temp;
-  float pressure;
-  float altitude;
-  double acc_x;
-  double acc_y;
-  double acc_z;
-  double pitch;
-  double roll;
-  double yaw;
-  double mag_x;
-  double mag_y;
-  double mag_z;
-};
+    Specify the start and end state here, modify the START_STATE
+    to the state function you would like to test.
 */
+#define START_STATE IDLE
+#define END_STATE LANDED
 
-enum datatype {TIMESTAMP, BME_TEMP, IMU_TEMP, 
-                  PRESSURE, ALTITUDE, 
-                  ACC_X, ACC_Y, ACC_Z, 
-                  PITCH, ROLL, YAW, 
-                  MAG_X, MAG_Y, MAG_Z, NUM_TYPES};
+/*
+    Initializing the state function pointer and the start and end states
+*/
+int(*state_function)(double[]);
 
-//init data struct
-//SensorData data;
+
+/*
+    Possible states should be included in the state_func array 
+*/
+state_func state_funcs[NUM_STATES] = 
+    { idle_state, armed_state, burnout_state, 
+      airbrakes_state, apogee_state, drogue_state,
+      chute_state}; 
+        
+//Not includes states yet, may not be necessary.
+//landed_state 
+//liftoff_state,
+
+state current_state = START_STATE;
+return_code ret_code = REPEAT;
+
+//Initializing BME and IMU sensor
+BME280 Bme;
+Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
+
+int const diode = 13;
+
+/*
+    Setting up the chip select on the SD card and
+    initializing the datafile.
+ */
+uint8_t const SD_cspin = BUILTIN_SDCARD;
+File dataFile;
+const String filename = "Datafile.txt";
+
+//Init data array
 double data[NUM_TYPES];
 
 void setup()
@@ -60,19 +72,27 @@ void setup()
  
   //Start I2C
   Wire.begin();
+
+  delay(500);
   
   Serial.println("Starting I2C communication with BME280");
   if (!Bme.beginI2C())
   {
     Serial.println("The BME sensor did not respond. Please check wiring.");
-    while(1); //Freeze
+  }
+  else {
+    Serial.println("BME sensor successfully initialized");
   }
 
-  Serial.println("Starting I2C communication with IMU");
+  delay(200);
+  
+  Serial.println("Setting up the IMU..");
   if (!IMU.begin())
   {
     Serial.println("The sensor did not respond. Please check wiring.");
-    while(1); //Freeze
+  }
+  else {
+    Serial.println("IMU sensor successfully initialized");
   }
 
   //Setup SD-card module
@@ -100,7 +120,7 @@ void setup()
     String answer;
     answer = Serial.read(); 
     if (answer == "d"){
-      SD.remove("Datafile.txt");
+      SD.remove(filename.c_str());
       break;
     }
     else if (answer == "k") {
@@ -141,6 +161,11 @@ void loop()
   data[MAG_X] = mag.x();
   data[MAG_Y] = mag.y();
   data[MAG_Z] = mag.z();
+
+  //Running the state machine
+  state_function = state_funcs[current_state];
+  ret_code = return_code(state_function(data));
+  current_state = lookup_transition(current_state, ret_code);
   
   //Writing to SD card
   dataFile = SD.open("Datafile.txt", FILE_WRITE);
@@ -151,10 +176,7 @@ void loop()
     Serial.println("Error opening file");
   }
   dataFile.close();
-
   delay(500);
-  
-  
 }
 
 String createDataString(double data[NUM_TYPES]){
@@ -167,39 +189,3 @@ String createDataString(double data[NUM_TYPES]){
 
   return dataString;
 }
-
-
-/*String createDataString(SensorData data){
-  String dataString = "";
-
-  dataString += String(data.timestamp);
-  dataString += ",";
-  dataString += String(data.bme_temp);
-  dataString += ",";
-  dataString += String(data.IMU_temp);
-  dataString += ",";
-  dataString += String(data.pressure);
-  dataString += ",";
-  dataString += String(data.altitude);
-  dataString += ",";
-  dataString += String(data.acc_x);
-  dataString += ",";
-  dataString += String(data.acc_y);
-  dataString += ",";
-  dataString += String(data.acc_z);
-  dataString += ",";
-  dataString += String(data.pitch);
-  dataString += ",";
-  dataString += String(data.roll);
-  dataString += ",";
-  dataString += String(data.yaw);
-  dataString += ",";
-  dataString += String(data.mag_x);
-  dataString += ",";
-  dataString += String(data.mag_y);
-  dataString += ",";
-  dataString += String(data.mag_z);
-
-  return dataString;
-}
-*/
