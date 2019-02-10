@@ -24,7 +24,7 @@ Teensyduino - https://www.pjrc.com/teensy/td_download.html
 ### Hardware
 
 16 GB SDHC card.
-BMP280 pressure sensor.
+BMP280 pressure.
 BNO055 IMU.
 
 ## Running the code on the Teensy 3.6
@@ -32,7 +32,7 @@ BNO055 IMU.
 Follow the following guide to connect the Teensy 3.6 to Arduino: 
 https://www.pjrc.com/teensy/tutorial.html
 
-Simply open the sensor_interface.ino file using the Arduino IDE and hit upload.
+Simply open the flight_computer.ino file using the Arduino IDE and hit upload.
 
 ### Editing the code/test code
 
@@ -44,7 +44,7 @@ this can be done by the following procedure:
 src/FSM/states
 2. Put your code/changes inside the xxxx_state.cpp file
 3. If you would like to only test your state, edit the START_STATE variable inside
-the sensor_interface.ino file to XXXX in capital letters.
+the flight_computer.ino file to XXXX in capital letters.
 4. If you would like to test the entry of the state, locate the previous state
 under src/FSM inside the states.h file(The previous state inside the enum state).
 5. Simply save all changes and then hit upload.
@@ -54,4 +54,4 @@ under src/FSM inside the states.h file(The previous state inside the enum state)
 
 * **Kevin Kaldvansvik** - *Initial work* - [Kevinkald](https://github.com/Kevinkald)
 
-See also the list of [contributors](https://github.com/SensorInterface/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/Propulse/NTNU/Flight-computer/contributors) who participated in this project.
