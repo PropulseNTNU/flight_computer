@@ -2,14 +2,14 @@
 #define STATES_H
 
 //Include states here
-#include "idle_state.h"
-#include "armed_state.h"
+#include "states/idle_state.h"
+#include "states/armed_state.h"
 //#include "liftoff_state.h"
-#include "burnout_state.h"
-#include "airbrakes_state.h"
-#include "apogee_state.h"
-#include "drogue_state.h"
-#include "chute_state.h"
+#include "states/burnout_state.h"
+#include "states/airbrakes_state.h"
+#include "states/apogee_state.h"
+#include "states/drogue_state.h"
+#include "states/chute_state.h"
 /*
 #include "landed_state.h"*/
 

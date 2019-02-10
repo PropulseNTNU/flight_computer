@@ -1,5 +1,5 @@
 using namespace std;
-#include "states.h"
+#include "../states.h"
 #include <Arduino.h>
 
 int armed_state(double data[]) {

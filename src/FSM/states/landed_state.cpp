@@ -1,5 +1,5 @@
 using namespace std;
-#include "states.h"
+#include "../states.h"
 
 //Does nothing
 int landed_state(void) {
