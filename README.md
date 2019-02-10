@@ -1,4 +1,4 @@
-# Sensor Interface
+# Flight Computer
 
 This repository contains the code necessary to run the flight computer including sensors and the state machine.
 
@@ -8,7 +8,7 @@ Start by making a directory flight_computer and clone this repository inside to 
 ```
 cd
 mkdir flight_computer && cd $_
-git clone https://github.com/PropulseNTNU/SensorInterface.git
+git clone https://github.com/PropulseNTNU/Flight-Computer.git
 ```
 
 ### Prerequisites
