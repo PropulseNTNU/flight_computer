@@ -23,9 +23,10 @@ Teensyduino - https://www.pjrc.com/teensy/td_download.html
 
 ### Hardware
 
-16 GB SDHC card.
-BMP280 pressure.
-BNO055 IMU.
+1. Teensy 3.6
+2. 16 GB SDHC card.
+3. BMP280 pressure.
+4. BNO055 IMU.
 
 ## Running the code on the Teensy 3.6
 
