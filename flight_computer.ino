@@ -24,7 +24,7 @@ const int IMU_ADDRESS = 0x28;
     Specify the start and end state here, modify the START_STATE
     to the state function you would like to test.
 */
-#define START_STATE IDLE
+#define START_STATE BURNOUT
 #define END_STATE LANDED
 
 /*
@@ -112,7 +112,6 @@ void setup()
   LEDConfig(diode);
   LEDSetMode(diode, HIGH);
 
-
   //Delete file?
   Serial.println("Type 'd'/'k' to delete or keep log file ");
   
@@ -166,6 +165,7 @@ void loop()
   state_function = state_funcs[current_state];
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
+  Serial.println(current_state);
   
   //Writing to SD card
   dataFile = SD.open("Datafile.txt", FILE_WRITE);
