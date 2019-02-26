@@ -5,13 +5,9 @@ using namespace std;
 //Only the arm button b should trigger next state
 int idle_state(double data[]) {
 	return_code ret_code;
-	String arm;
-	Serial.println("Arm rocket by pushing b" );
-	arm = Serial.read();
-	//Serial.println(data[1]);
-	delay(400);
-	if (arm == "b") {
-		Serial.println("rocket armed!" );
+
+	
+	if (true){
 		ret_code = NEXT;
 	}
 	else {
