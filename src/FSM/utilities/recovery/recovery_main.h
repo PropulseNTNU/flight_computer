@@ -1,5 +1,5 @@
-#ifndef recovery_main_hpp
-#define recovery_main_hpp
+#ifndef recovery_main_h
+#define recovery_main_h
 
 struct ParachuteStateStruct {
     bool drogueDeployed; //type uint8_t = 1 byte
@@ -38,4 +38,4 @@ struct UpdateAltitude {
 } customAlt;
 
 
-#endif /* recovery_main_hpp */
+#endif /* recovery_main_h */
