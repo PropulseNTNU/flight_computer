@@ -6,6 +6,8 @@
 	Also remember to explain what it returns and why.
 */
 
+#define DrogueServoPin 2
+
 int apogee_state(double data[]);
 
 #endif
