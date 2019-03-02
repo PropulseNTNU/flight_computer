@@ -2,12 +2,11 @@ using namespace std;
 #include "../states.h"
 #include <Arduino.h>
 
-//Only the arm button b should trigger next state
+//Only the arm button should trigger next state
 int idle_state(double data[]) {
 	return_code ret_code;
 
-	
-	if (true){
+	if (digitalRead(ARM_BUTTON_PIN)){
 		ret_code = NEXT;
 	}
 	else {
