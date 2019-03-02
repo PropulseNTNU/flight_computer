@@ -10,12 +10,15 @@
 #include "states/apogee_state.h"
 #include "states/drogue_state.h"
 #include "states/chute_state.h"
-/*
-#include "landed_state.h"*/
+#include "states/landed_state.h"
+
+#define ARM_BUTTON_PIN 34
+#define RESET_IMU_PIN 23
 
 //All posible states, NUM_STATES is not a state
+//Liftoff_state not included
 enum state {
-	IDLE, ARMED, LIFTOFF, BURNOUT, AIRBRAKES,
+	IDLE, ARMED, BURNOUT, AIRBRAKES,
 	APOGEE, DROGUE, CHUTE, LANDED, NUM_STATES
 };
 
@@ -47,6 +50,6 @@ enum datatype {	  TIMESTAMP, BME_TEMP, IMU_TEMP,
                   GRAVITY_ACC_X,GRAVITY_ACC_Y,GRAVITY_ACC_Z, 
                   LINEAR_ACCEL_X,LINEAR_ACCEL_Y,LINEAR_ACCEL_Z,
                   QUATERNION_X, QUATERNION_Y, QUATERNION_Z, QUATERNION_W,
-                  NUM_TYPES
+                  STATE, NUM_TYPES
               };
 #endif
