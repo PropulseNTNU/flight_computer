@@ -9,17 +9,14 @@
 */
 
 #include <Wire.h>
-//#include <SPI.h>
-#include <Time.h>
 #include <SD.h>
-#include "src/LED/LED.h"
 #include "src/BME280/SparkFunBME280.h"
 #include "src/Adafruit_BNO055/Adafruit_BNO055.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
-
+ 
 //Adresses
-const int IMU_ADDRESS = 0x28;
+const uint8_t IMU_ADDRESS = 0x28;
 
 /*
     Specify the start and end state here, modify the START_STATE
@@ -40,10 +37,9 @@ int(*state_function)(double[]);
 state_func state_funcs[NUM_STATES] = 
     { idle_state, armed_state, burnout_state, 
       airbrakes_state, apogee_state, drogue_state,
-      chute_state}; 
+      chute_state, landed_state}; 
         
 //Not includes states yet, may not be necessary.
-//landed_state 
 //liftoff_state,
 
 state current_state = START_STATE;
@@ -53,7 +49,7 @@ return_code ret_code = REPEAT;
 BME280 Bme;
 Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
 
-int const diode = 13;
+int const LED_pin = 13;
 
 /*
     Setting up the chip select on the SD card and
@@ -71,6 +67,7 @@ double data[NUM_TYPES];
 
 void setup()
 {
+  
   //Setup serial connection
   Serial.begin(9600);
  
@@ -111,9 +108,15 @@ void setup()
     delay(2000); 
   }
 
+    //Setup ARM button pin
+  pinMode(ARM_BUTTON_PIN, INPUT);
+
+  //Setup Reset IMU pin
+  pinMode(RESET_IMU_PIN, OUTPUT);
+  
   //Successfull setup -> lights diode
-  LEDConfig(diode);
-  LEDSetMode(diode, HIGH);
+  pinMode(LED_pin, OUTPUT);
+  digitalWrite(LED_pin, HIGH);
 
 
   //Delete file?
@@ -146,10 +149,16 @@ void loop()
   state_function = state_funcs[current_state];
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
+  data[STATE] = current_state;
+
+  if(ret_code == NEXT && current_state==ARMED){
+    IMU.begin();
+    delay(100);
+  }
   
   //Starting writing to SD card when ARMED
   dataFile = SD.open("Datafile.txt", FILE_WRITE);
-  if (dataFile && (current_state >= ARMED) && millis() - prevLogTime >= logEveryKMsec) {
+  if (dataFile && (current_state >= IDLE) && millis() - prevLogTime >= logEveryKMsec) {
     prevLogTime = millis();
     dataFile.println(createDataString(data));
   }
@@ -174,9 +183,9 @@ String createDataString(double data[NUM_TYPES]){
 /*
     Note that the IMU has declared x axis as the yaw axis, the y axis as the
     pitch axis and the z axis as the roll axis. This is corrected as:
-      roll = x axis
+      roll  = x axis
       pitch = y axis
-      yaw = z axis
+      yaw   = z axis
 */
 void readSensors(){
   //Update BMP280 sensor data
