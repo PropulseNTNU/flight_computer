@@ -10,12 +10,12 @@
 #include "states/apogee_state.h"
 #include "states/drogue_state.h"
 #include "states/chute_state.h"
-/*
-#include "landed_state.h"*/
+#include "states/landed_state.h"
 
 //All posible states, NUM_STATES is not a state
+//Liftoff_state not included
 enum state {
-	IDLE, ARMED, LIFTOFF, BURNOUT, AIRBRAKES,
+	IDLE, ARMED, BURNOUT, AIRBRAKES,
 	APOGEE, DROGUE, CHUTE, LANDED, NUM_STATES
 };
 
@@ -31,9 +31,22 @@ typedef int(*state_func)(double[]);
 //	};
 //}
 
-enum datatype {TIMESTAMP, BME_TEMP, IMU_TEMP, 
+/*
+	NB: ACC_X,Y,Z contains linear acceleration + gravity
+		GRAVITY_ACCEL_X, Y, Z contains only gravity components
+		LINEAR_ACCEL_X,Y,Z contains ONLY linear accelerations.
+
+	Angular velocities in dps per now.
+*/
+enum datatype {	  TIMESTAMP, BME_TEMP, IMU_TEMP, 
                   PRESSURE, ALTITUDE, 
                   ACC_X, ACC_Y, ACC_Z, 
-                  PITCH, ROLL, YAW, 
-                  MAG_X, MAG_Y, MAG_Z, NUM_TYPES};
+                  ROLL, PITCH, YAW, 
+                  MAG_X, MAG_Y, MAG_Z,
+                  ANGULAR_VEL_X,ANGULAR_VEL_Y,ANGULAR_VEL_Z,
+                  GRAVITY_ACC_X,GRAVITY_ACC_Y,GRAVITY_ACC_Z, 
+                  LINEAR_ACCEL_X,LINEAR_ACCEL_Y,LINEAR_ACCEL_Z,
+                  QUATERNION_X, QUATERNION_Y, QUATERNION_Z, QUATERNION_W,
+                  STATE, NUM_TYPES
+              };
 #endif
