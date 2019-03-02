@@ -12,9 +12,6 @@
 #include "states/chute_state.h"
 #include "states/landed_state.h"
 
-#define ARM_BUTTON_PIN 34
-#define RESET_IMU_PIN 23
-
 //All posible states, NUM_STATES is not a state
 //Liftoff_state not included
 enum state {

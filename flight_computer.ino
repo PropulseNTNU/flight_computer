@@ -4,7 +4,7 @@
     2. Setting up serial and i2c communication with sensors and SD card.
     3. Setting up the BME280 altitude sensor.
     4. Setting up the BNO055 IMU sensor.
-    5. Logging the sensor data to the text file on the SD Card.
+    5. Reading and logging the sensor data to the text file on the SD Card.
     6. Running the Finite State Machine.
 */
 
@@ -15,8 +15,12 @@
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
  
-//Adresses
+/*
+    Setup of adresses
+ */
 const uint8_t IMU_ADDRESS = 0x28;
+const uint8_t SD_CS_pin = BUILTIN_SDCARD;
+#define LED_pin 3
 
 /*
     Specify the start and end state here, modify the START_STATE
@@ -26,39 +30,29 @@ const uint8_t IMU_ADDRESS = 0x28;
 #define END_STATE LANDED
 
 /*
-    Initializing the state function pointer and the start and end states
+    Initialization of the state machine, including legal state function.
 */
 int(*state_function)(double[]);
 
-
-/*
-    Possible states should be included in the state_func array 
-*/
 state_func state_funcs[NUM_STATES] = 
     { idle_state, armed_state, burnout_state, 
       airbrakes_state, apogee_state, drogue_state,
       chute_state, landed_state}; 
-        
-//Not includes states yet, may not be necessary.
-//liftoff_state,
 
 state current_state = START_STATE;
 return_code ret_code = REPEAT;
 
-//Initializing BME and IMU sensor
+/*
+    Initialization of the BME and IMU sensor
+ */
 BME280 Bme;
 Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
 
-int const LED_pin = 13;
-
 /*
-    Setting up the chip select on the SD card and
-    initializing the datafile.
+    Initialization of the data file
  */
-uint8_t const SD_cspin = BUILTIN_SDCARD;
 File dataFile;
 const String filename = "Datafile.txt";
-// frequency in Hz
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
 
@@ -89,7 +83,7 @@ void setup()
   Serial.println("Setting up the IMU..");
   if (!IMU.begin())
   {
-    Serial.println("The sensor did not respond. Please check wiring.");
+    Serial.println("The IMU sensor did not respond. Please check wiring.");
   }
   else {
     Serial.println("IMU sensor successfully initialized");
@@ -97,7 +91,7 @@ void setup()
   delay(200);
   
   //Setup SD-card module
-  if (!SD.begin(SD_cspin)) {
+  if (!SD.begin(SD_CS_pin)) {
     Serial.println("initialization failed!");
     delay(1000);
     return;
@@ -108,11 +102,8 @@ void setup()
     delay(2000); 
   }
 
-    //Setup ARM button pin
+  //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
-
-  //Setup Reset IMU pin
-  pinMode(RESET_IMU_PIN, OUTPUT);
   
   //Successfull setup -> lights diode
   pinMode(LED_pin, OUTPUT);
@@ -138,7 +129,6 @@ void setup()
     }
   }
   Serial.println("Continuing..");
-
 }
 
 void loop()
@@ -151,6 +141,7 @@ void loop()
   current_state = lookup_transition(current_state, ret_code);
   data[STATE] = current_state;
 
+  //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
     IMU.begin();
     delay(100);
@@ -166,7 +157,6 @@ void loop()
     Serial.println("Error opening file");
   }
   dataFile.close();
-
 }
 
 String createDataString(double data[NUM_TYPES]){
