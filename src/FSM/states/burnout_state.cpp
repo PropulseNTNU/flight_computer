@@ -6,7 +6,7 @@ using namespace std;
 int burnout_state(double data[]) {
 	return_code ret_code;
 	Serial.println("Waiting for z-accel input: must be less or equal to 0");
-	if (data[ACC_Z] <= 10.0) {
+	if (data[ACC_Z] <= 0) {
 		ret_code = NEXT;
 	}
 	else {

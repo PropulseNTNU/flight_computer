@@ -14,13 +14,14 @@
 #include "src/Adafruit_BNO055/Adafruit_BNO055.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
+#include "src/simulator/serial_reader.h"
  
 /*
     Setup of adresses
  */
 const uint8_t IMU_ADDRESS = 0x28;
 const uint8_t SD_CS_pin = BUILTIN_SDCARD;
-#define LED_pin 3
+#define LED_pin 13
 
 /*
     Specify the start and end state here, modify the START_STATE
@@ -34,13 +35,13 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
 */
 int(*state_function)(double[]);
 
-state_func state_funcs[NUM_STATES] = 
+state_func state_functions[NUM_STATES] = 
     { idle_state, armed_state, burnout_state, 
       airbrakes_state, apogee_state, drogue_state,
       chute_state, landed_state}; 
 
 state current_state = START_STATE;
-return_code ret_code = REPEAT;
+return_code state_transition = REPEAT;
 
 /*
     Initialization of the BME and IMU sensor
@@ -58,6 +59,7 @@ unsigned long prevLogTime;
 
 //Init data array
 double data[NUM_TYPES];
+
 
 void setup()
 {
@@ -94,7 +96,6 @@ void setup()
   if (!SD.begin(SD_CS_pin)) {
     Serial.println("initialization failed!");
     delay(1000);
-    return;
   }
   else {
     delay(1000);
@@ -105,11 +106,6 @@ void setup()
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
   
-  //Successfull setup -> lights diode
-  pinMode(LED_pin, OUTPUT);
-  digitalWrite(LED_pin, HIGH);
-
-
   //Delete file?
   Serial.println("Type 'd'/'k' to delete or keep log file ");
 
@@ -129,23 +125,40 @@ void setup()
     }
   }
   Serial.println("Continuing..");
+
+  //Successfull setup -> lights diode
+  pinMode(LED_pin, OUTPUT);
+  digitalWrite(LED_pin, HIGH);
+  delay(500);
 }
 
 void loop()
 { 
-  readSensors();
-  
+  //readSensors();
+
+  updateSensorData(data);
+
+  Serial.print("t_h");
+  Serial.println(data[ALTITUDE]);
+
+  Serial.print("t_a");
+  Serial.println(data[ACC_Z]);
+
+  Serial.print("curr_state");
+  Serial.println(data[STATE]);
+
   //Running the state machine
-  state_function = state_funcs[current_state];
-  ret_code = return_code(state_function(data));
-  current_state = lookup_transition(current_state, ret_code);
+  state_function = state_functions[current_state];
+  state_transition = return_code(state_function(data));
+  current_state = lookup_transition(current_state, state_transition);
   data[STATE] = current_state;
 
   //Reset IMU when transitioning to ARMED state
-  if(ret_code == NEXT && current_state==ARMED){
+  if(state_transition == NEXT && current_state==ARMED){
     IMU.begin();
     delay(100);
   }
+
   
   //Starting writing to SD card when ARMED
   dataFile = SD.open("Datafile.txt", FILE_WRITE);
