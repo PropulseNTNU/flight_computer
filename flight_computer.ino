@@ -147,6 +147,8 @@ void loop()
     Serial.println("Error opening file");
   }
   dataFile.close();
+
+  Serial.println(data[BME_TEMP]);
 }
 
 String createDataString(double data[NUM_TYPES]){
