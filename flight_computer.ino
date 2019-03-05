@@ -94,7 +94,6 @@ void setup()
   if (!SD.begin(SD_CS_pin)) {
     Serial.println("initialization failed!");
     delay(1000);
-    return;
   }
   else {
     delay(1000);
