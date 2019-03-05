@@ -10,15 +10,13 @@
 
 #include <Wire.h>
 #include <SD.h>
-#include "src/BME280/SparkFunBME280.h"
-#include "src/Adafruit_BNO055/Adafruit_BNO055.h"
+#include "src/sensor_interface/sensor_interface.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
  
 /*
     Setup of adresses
  */
-const uint8_t IMU_ADDRESS = 0x28;
 const uint8_t SD_CS_pin = BUILTIN_SDCARD;
 #define LED_pin 3
 
@@ -41,12 +39,6 @@ state_func state_funcs[NUM_STATES] =
 
 state current_state = START_STATE;
 return_code ret_code = REPEAT;
-
-/*
-    Initialization of the BME and IMU sensor
- */
-BME280 Bme;
-Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
 
 /*
     Initialization of the data file
@@ -103,11 +95,6 @@ void setup()
 
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
-  
-  //Successfull setup -> lights diode
-  pinMode(LED_pin, OUTPUT);
-  digitalWrite(LED_pin, HIGH);
-
 
   //Delete file?
   Serial.println("Type 'd'/'k' to delete or keep log file ");
@@ -128,11 +115,15 @@ void setup()
     }
   }
   Serial.println("Continuing..");
+
+  //Setup done -> lights diode on teensy
+  pinMode(LED_pin, OUTPUT);
+  digitalWrite(LED_pin, HIGH);
 }
 
 void loop()
 { 
-  readSensors();
+  readSensors(data);
   
   //Running the state machine
   state_function = state_funcs[current_state];
@@ -167,67 +158,4 @@ String createDataString(double data[NUM_TYPES]){
   }
 
   return dataString;
-}
-
-/*
-    Note that the IMU has declared x axis as the yaw axis, the y axis as the
-    pitch axis and the z axis as the roll axis. This is corrected as:
-      roll  = x axis
-      pitch = y axis
-      yaw   = z axis
-*/
-void readSensors(){
-  //Update BMP280 sensor data
-  data[BME_TEMP] = Bme.readTempC();
-  data[PRESSURE] = Bme.readFloatPressure();
-  data[ALTITUDE] = Bme.readFloatAltitudeMeters();
-
-  //Temp IMU deg
-  data[IMU_TEMP] = IMU.getTemp();
-
-  //Extract Acceleration in m/s^2
-  imu::Vector<3> accel = IMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-  data[ACC_X] = accel.x();
-  data[ACC_Y] = accel.y();
-  data[ACC_Z] = accel.z();
-  
-  //Extract magnetometer data in uT
-  imu::Vector<3> mag = IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-  data[MAG_X] = mag.x();
-  data[MAG_Y] = mag.y();
-  data[MAG_Z] = mag.z();
-
-  //Extract euler angles in deg
-  imu::Vector<3> euler = IMU.getVector(Adafruit_BNO055::VECTOR_EULER);
-  data[ROLL] = euler.z();
-  data[PITCH] = euler.y();
-  data[YAW] = euler.x();
-
-  //Extract angular rates in dps
-  imu::Vector<3> rates = IMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  data[ANGULAR_VEL_X] = rates.z();
-  data[ANGULAR_VEL_Y] = rates.y();
-  data[ANGULAR_VEL_Z] = rates.x();
-
-  //Extract gravity components
-  imu::Vector<3> gravity = IMU.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
-  data[GRAVITY_ACC_X] = gravity.x();
-  data[GRAVITY_ACC_Y] = gravity.y();
-  data[GRAVITY_ACC_Z] = gravity.z();
-
-  //linear acceleration = acceleration - gravity
-  imu::Vector<3> linear_accel = IMU.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  data[LINEAR_ACCEL_X] = linear_accel.x();
-  data[LINEAR_ACCEL_Y] = linear_accel.y();
-  data[LINEAR_ACCEL_Z] = linear_accel.z();
-
-  //Extract unit quaternions
-  imu::Quaternion quaternions = IMU.getQuat(); 
-  data[QUATERNION_X] = quaternions.x();
-  data[QUATERNION_Y] = quaternions.y();
-  data[QUATERNION_Z] = quaternions.z();
-  data[QUATERNION_W] = quaternions.w();
-
-  //data[TIMESTAMP]= event.timestamp;
-  data[TIMESTAMP] = millis();
 }
