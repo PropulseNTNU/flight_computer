@@ -138,16 +138,18 @@ void loop()
   }
   
   //Starting writing to SD card when ARMED
-  dataFile = SD.open("Datafile.txt", FILE_WRITE);
-  if (dataFile && (current_state >= IDLE) && millis() - prevLogTime >= logEveryKMsec) {
+  if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
     prevLogTime = millis();
-    dataFile.println(createDataString(data));
-  }
-  else {
+    dataFile = SD.open("Datafile.txt", FILE_WRITE);
+    if (dataFile) {
+   		dataFile.println(createDataString(data));
+    }
+    else {
     Serial.println("Error opening file");
+    }
+    dataFile.close();
   }
-  dataFile.close();
-
+  
   Serial.println(data[BME_TEMP]);
 }
 
