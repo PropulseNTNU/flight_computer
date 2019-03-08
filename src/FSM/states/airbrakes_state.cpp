@@ -37,20 +37,20 @@ int airbrakes_state(double data[]) {
 	dt = (float)(time_new - time_old);
 	dt /= (float)1000000; // converted to seconds
 
-	kalman(estimates, sensor_data[0], sensor_data[1], dt, reference_v);
+	kalman(estimates, data[ALTITUDE], data[ACC_Z], dt, reference_v);
+	// write kalman values to file
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = reference_v - estimates[1];
 	u += controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
 	time_old = time_new;
-	Serial.print("Iteration time: ");
-	Serial.println(dt);
+	// write error and controll signal too file before if statement
 	if(u >= 0 && u <= 180) {
 		airbrakes_servo.write(u); //updates servo position
 	}
 
     // remmember to update this to correct tests
-	if (estimates[1] <= -100) {
-		ret_code = REPEAT;
+	if () {
+		ret_code = NEXT;
 	}
 	else {
 		ret_code = REPEAT;

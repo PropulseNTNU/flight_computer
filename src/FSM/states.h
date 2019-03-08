@@ -10,12 +10,13 @@
 #include "states/apogee_state.h"
 #include "states/drogue_state.h"
 #include "states/chute_state.h"
-/*
-#include "landed_state.h"*/
+#include "states/landed_state.h"
+#include "../sensor_interface/sensor_data.h"
 
 //All posible states, NUM_STATES is not a state
+//Liftoff_state not included
 enum state {
-	IDLE, ARMED, LIFTOFF, BURNOUT, AIRBRAKES,
+	IDLE, ARMED, BURNOUT, AIRBRAKES,
 	APOGEE, DROGUE, CHUTE, LANDED, NUM_STATES
 };
 
@@ -30,10 +31,4 @@ typedef int(*state_func)(double[]);
 //		AIRBRAKES, APOGEE, LANDED*/
 //	};
 //}
-
-enum datatype {TIMESTAMP, BME_TEMP, IMU_TEMP, 
-                  PRESSURE, ALTITUDE, 
-                  ACC_X, ACC_Y, ACC_Z, 
-                  PITCH, ROLL, YAW, 
-                  MAG_X, MAG_Y, MAG_Z, NUM_TYPES};
 #endif

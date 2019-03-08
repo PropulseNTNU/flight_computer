@@ -6,6 +6,6 @@
 	Also remember to explain what it returns and why.
 */
 
-int landed_state(void);
+int landed_state(double data[]);
 
 #endif
