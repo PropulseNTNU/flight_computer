@@ -2,7 +2,9 @@
 #include "Arduino.h"
 using namespace std;
 
-double totalLinAcceleration (double data[]) {
+const double APOGEE_ACC_VAL = 0.3;
+
+double totalLinAcceleration (double* data) {
     return sqrt(sq(data[LINEAR_ACCEL_X])+sq(LINEAR_ACCEL_Y)+sq(LINEAR_ACCEL_Z));
 }
 
@@ -16,56 +18,55 @@ void updateArray(double* altitudes, double input) {
     }
 }
 
-double returnMax(double* anArray) {
-    double max = -1;
-    for (int i = 0; i < 10; i++) {
-        if (anArray[i] > max) {
-            max = anArray[i];
-        }
-    }
-    return max;
-}
-
-double returnRange(double* anArray) {
-    double min = 9999;
-    for (int i = 0; i < 10; i++) {
-        if (anArray[i] < min) {
-            min = anArray[i];
-        }
-    }
-    return (returnMax(anArray)-min);
-}
-
-double returnAvgDiff(double* anArray) {
+void updateApogeeData(double* apogeeDataArray) {
     double sumDiff = 0;
     double diff = 0;
-    for (int i = 0; i < 9; i++) {
-        diff = (anArray[i] - anArray[i+1]);
-        if (diff > 0) {
-            sumDiff += diff;
-        } else {
-            sumDiff += -(diff);
+    double min = 9999;
+    double max = 0;
+    for (int i = 0; i < 10; i++) {
+        if (apogeeDataArray[i] > apogeeDataArray[MAX_ALTITUDE]) {
+            apogeeDataArray[MAX_ALTITUDE] = apogeeDataArray[i];
+        }
+        if (apogeeDataArray[i] > max) {
+            max = apogeeDataArray[i];
+        }
+        if (apogeeDataArray[i] < min) {
+            min = apogeeDataArray[i];
+        }
+        if (i <= 9) {
+            diff = (apogeeDataArray[i] - apogeeDataArray[i+1]);
+            if (diff > 0) {
+                sumDiff += diff;
+            } else {
+                sumDiff += -(diff);
+            }
         }
     }
-    return (sumDiff/10);
+    apogeeDataArray[RANGE] = max-min;
+    apogeeDataArray[AVERAGE_DIFF] = sumDiff/10;
 }
 
 void ApogeeArray::updateApogeeArray(ApogeeArray* alt, double currentAlt) {
     updateArray(alt->altitudes, currentAlt);
-    alt->arrayLen = 10;
-    alt->range = returnRange(alt->altitudes);
-    alt->maxAltitude = returnMax(alt->altitudes);
-    alt->averageDiff = returnAvgDiff(alt->altitudes);
-    
+    updateApogeeData(alt->apogeeData);
 }
 
+//TIMESTAMP IN DATA ARRAY
+bool apogeeDetected(ApogeeArray* apogee, double* data) { //BEST OPTION TO TRIGGER A TIMER (if second test never satisfied.)
+    if ((totalLinAcceleration(data) < APOGEE_ACC_VAL) && (apogee->apogeeData[AVERAGE_DIFF] < 10)) {
+        if ((apogee->apogeeData[MAX_ALTITUDE] - apogee->apogeeData[AVERAGE_ALTITUDE]) < 10) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 void printArray(double* array, int length) {
-    /*
     for (int n = 0; n < length; n++) {
         Serial.print(array[n]);
     }
     Serial.println("");
-     */
     /*
     for (int n = 0; n < length; n++) {
         cout << array[n];
@@ -76,12 +77,12 @@ void printArray(double* array, int length) {
 
 void printApogeeArray(ApogeeArray alt) {
     Serial.print("Max H: ");
-    Serial.println(alt.maxAltitude);
+    Serial.println(alt.apogeeData[MAX_ALTITUDE]);
     Serial.print("Average diff: ");
-    Serial.println(alt.averageDiff);
+    Serial.println(alt.apogeeData[AVERAGE_DIFF]);
     Serial.print("Range: ");
-    Serial.println(alt.range);
-    printArray(alt.altitudes, alt.arrayLen);
+    Serial.println(alt.apogeeData[RANGE]);
+    printArray(alt.altitudes, 10);
     /*
     cout << "Max H: " << alt.maxAltitude << endl;
     cout << "Average diff: " << alt.averageDiff << endl;
