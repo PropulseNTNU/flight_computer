@@ -9,9 +9,9 @@
 */
 
 #include <Wire.h>
-#include "src/sensor_interface/sensor_interface.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
+#include "src/sensor_interface/sensor_interface.h"
 #include "src/SD_interface/SD_interface.h"
 #include "src/servo_interface/servo_interface.h"
  
@@ -25,7 +25,7 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
     Specify the start and end state here, modify the START_STATE
     to the state function you would like to test.
 */
-#define START_STATE BURNOUT
+#define START_STATE IDLE
 #define END_STATE LANDED
 
 /*
@@ -114,6 +114,8 @@ void setup()
     answer = Serial.read(); 
     if (answer == "d"){
       SD.remove(fileName.c_str());
+      delay(10);
+      init_SD(fileName.c_str());
       break;
     }
     else if (answer == "k") {
@@ -152,6 +154,4 @@ void loop()
       prevLogTime = millis();
       write_SD(data);
   }
-  
-  Serial.println(data[BME_TEMP]);
 }
