@@ -10,15 +10,13 @@ using namespace std;
  
  */
 
-static bool mainServoEnd = false;
-
 int chute_state(double data[]) {
     return_code ret_code;
     
     if (data[ALTITUDE] <= MainServoEndAlt) {
         
         //Stop or disconnect both motors (necessary with continuous servo)
-        mainServoEnd = true;
+        getParachute()->mainStopped = true;
     }
     
     if (data[ALTITUDE] <= 5) {

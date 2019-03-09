@@ -1,6 +1,7 @@
 using namespace std;
 #include "../states.h"
 #include "../utilities/recovery/recovery.h"
+#include "../../servo_interface/servo_interface.h"
 #include "drogue_state.h"
 #include <Arduino.h>
 
@@ -10,25 +11,15 @@ using namespace std;
  
  */
 
-static bool doSetup = true;
-static bool mainDeployed = false;
-static PWMServo mainServo;
-
-
 int drogue_state(double data[]) {
     return_code ret_code;
     
-    if (doSetup) {
-        mainServo.attach(MainServoPin);
-        doSetup = false;
+    if ((!getParachute()->mainDeployed) && (data[ALTITUDE] <= MainChuteALT)) {
+        get_servo(MAIN_SERVO)->write(5);
+        getParachute()->mainDeployed = true;
     }
     
-    if ((!mainDeployed) && (data[ALTITUDE] <= MainChuteALT)) {
-        mainServo.write(0);     //clock-wise
-        mainDeployed = true;
-    }
-    
-    if (mainDeployed) {
+    if (getParachute()->mainDeployed) {
         ret_code = NEXT;
     } else {
         ret_code = REPEAT;

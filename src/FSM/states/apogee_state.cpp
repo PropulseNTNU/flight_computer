@@ -1,6 +1,7 @@
 using namespace std;
 #include "../states.h"
 #include "../utilities/recovery/recovery.h"
+#include "../../servo_interface/servo_interface.h"
 #include "apogee_state.h"
 #include <Arduino.h>
 
@@ -12,19 +13,15 @@ using namespace std;
 
 // CHECK Y_Vel or just pitch if it crosses 20 deg also?
 
-static bool drogueDeployed = false;
-static PWMServo drogueServo;
-
 int apogee_state(double data[]) {
     return_code ret_code;
     
-    if (!drogueDeployed) {
-        drogueServo.attach(DrogueServoPin);
-        drogueServo.write(5);     //clock-wise
-        drogueDeployed = true;
+    if (!getParachute()->drogueDeployed) {
+        get_servo(DROGUE_SERVO)->write(5);
+        getParachute()->drogueDeployed = true;
     }
     
-    if (drogueDeployed) {
+    if (getParachute()->drogueDeployed) {
         ret_code = NEXT;
     } else {
         ret_code = REPEAT;

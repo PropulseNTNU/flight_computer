@@ -1,36 +1,31 @@
 #pragma once
-#include <PWMServo.h>
-
 #ifndef RECOVERY_H
 #define RECOVERY_H
 
-#ifndef DrogueServoPin
+#include <Servo.h>
+#include "apogee_detect.h"
+
 #define DrogueServoPin 2
-#endif
-
-#ifndef MainServoPin
 #define MainServoPin 3
-#endif
-
-#ifndef MainChuteALT
 #define MainChuteALT 457
-#endif
 
 /*
  Structs and globals not used.
  */
 
 struct ParachuteStateStruct {
-    bool drogueDeployed; //type uint8_t = 1 byte
-    bool mainDeployed;
-    bool mainStopped;
-} ;
+    bool drogueDeployed = false; //type uint8_t = 1 byte
+    bool mainDeployed = false;
+    bool mainStopped = false;
+   // ParachuteStateStruct() : drogueDeployed(false), mainDeployed(false), mainStopped(false) {}
+};
 
+typedef struct ParachuteStateStruct Parachute;
 
 struct AltitudeStateStruct {
-    bool isFalling;
+    bool isFalling = false;
     //volatile double currentAltitude;     //data[ALTITUDE]
-    volatile double maxAltitude; //type uint32_t = 4 bytes
+    volatile double maxAltitude; //type uint64_t = 8 bytes
 };
 
 /* Alternative to struct -> array
@@ -38,12 +33,14 @@ struct AltitudeStateStruct {
  bool parachute_state[NUM_TYPES]; //to access bool variables, then instead of struct pointer we can use array pointer.
  */
 
+ApogeeArray* getApogee();
+ParachuteStateStruct* getParachute();
 
-//Setup done in armed_state.cpp (Some functions avoided since default initialisation used above)
-void setupMainServo(PWMServo main, int pin);
-void setupDrogueServo(PWMServo drogue, int pin);
-void setupParachuteS(ParachuteStateStruct* parachute_pointer);
-void setupAltitudeS(AltitudeStateStruct* alt_pointer);
+//(Some functions avoided since default initialisation used above)
+void setupMainServo(Servo main, int pin);
+void setupDrogueServo(Servo drogue, int pin);
+void setupParachuteS();
+void setupAltitudeS();
 
 
 //Temporary struct for altitude sim

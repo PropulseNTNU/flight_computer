@@ -11,6 +11,7 @@
 #include <Wire.h>
 #include <SD.h>
 #include "src/sensor_interface/sensor_interface.h"
+#include "src/servo_interface/servo_interface.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
  
@@ -24,7 +25,7 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
     Specify the start and end state here, modify the START_STATE
     to the state function you would like to test.
 */
-#define START_STATE IDLE
+#define START_STATE AIRBRAKES
 #define END_STATE LANDED
 
 /*
@@ -96,6 +97,11 @@ void setup()
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
 
+  //Setup Servos
+  init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN);
+  init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN);
+  init_servo(MAIN_SERVO, MAIN_SERVO_PIN);
+  
   //Delete file?
   Serial.println("Type 'd'/'k' to delete or keep log file ");
 

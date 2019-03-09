@@ -1,8 +1,9 @@
-#include "apogee_detect.hpp"
+#include "apogee_detect.h"
+#include "Arduino.h"
 using namespace std;
 
 double totalLinAcceleration (double data[]) {
-    return Sqrt(Sq(data[LINEAR_ACCEL_X])+Sq(LINEAR_ACCEL_Y)+Sq(LINEAR_ACCEL_Z));
+    return sqrt(sq(data[LINEAR_ACCEL_X])+sq(LINEAR_ACCEL_Y)+sq(LINEAR_ACCEL_Z));
 }
 
 void updateArray(double* altitudes, double input) {
@@ -49,7 +50,7 @@ double returnAvgDiff(double* anArray) {
     return (sumDiff/10);
 }
 
-void updateHeightArray(Array* alt, double currentAlt) {
+void ApogeeArray::updateApogeeArray(ApogeeArray* alt, double currentAlt) {
     updateArray(alt->altitudes, currentAlt);
     alt->arrayLen = 10;
     alt->range = returnRange(alt->altitudes);
@@ -61,13 +62,26 @@ void updateHeightArray(Array* alt, double currentAlt) {
 void printArray(double* array, int length) {
     /*
     for (int n = 0; n < length; n++) {
+        Serial.print(array[n]);
+    }
+    Serial.println("");
+     */
+    /*
+    for (int n = 0; n < length; n++) {
         cout << array[n];
     }
     cout << endl;
     */
 }
 
-void printHeightArray(Array alt) {
+void printApogeeArray(ApogeeArray alt) {
+    Serial.print("Max H: ");
+    Serial.println(alt.maxAltitude);
+    Serial.print("Average diff: ");
+    Serial.println(alt.averageDiff);
+    Serial.print("Range: ");
+    Serial.println(alt.range);
+    printArray(alt.altitudes, alt.arrayLen);
     /*
     cout << "Max H: " << alt.maxAltitude << endl;
     cout << "Average diff: " << alt.averageDiff << endl;
