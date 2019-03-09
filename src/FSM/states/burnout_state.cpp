@@ -16,7 +16,7 @@ int burnout_state(double data[]) {
 	if(launchTime == 0){
 		launchTime = data[TIMESTAMP];
 	}
-	burntime += data[TIMESTAMP] - launchTime;
+	burntime = data[TIMESTAMP] - launchTime;
 
 	//if acc_z is negative but increasing
 	if(data[ACC_Z] > last_acc_z && last_acc_z < 0){

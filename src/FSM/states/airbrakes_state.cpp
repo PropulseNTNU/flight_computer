@@ -32,7 +32,7 @@ int airbrakes_state(double data[]) {
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = reference_v - estimates[1];
 	u += controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
-	
+
 	// write error and controll signal too file before if statement
 	if(u >= 0 && u <= 180) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position

@@ -31,7 +31,6 @@ bool init_SD(const char* fileName){
   return false;
 }
 
-
 void close_SD() {
   dataFile.close();
 }
