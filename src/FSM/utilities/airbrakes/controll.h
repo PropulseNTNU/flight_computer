@@ -1,8 +1,5 @@
 #ifndef AIRBRAKES_CONTROLL_H
 #define AIRBRAKES_CONTROLL_H
-#include <BasicLinearAlgebra.h>
-
-using namespace BLA;
 
 //structs
 typedef struct Parameters_t {
