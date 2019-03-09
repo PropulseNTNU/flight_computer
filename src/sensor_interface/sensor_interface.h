@@ -11,8 +11,8 @@ const uint8_t IMU_ADDRESS = 0x28;
     Initialization of the BME and IMU sensor
     BME sensor initial address 0x77, if jumper is added address is 0x76
  */
-static BME280 Bme;
-static Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
+extern BME280 Bme;
+extern Adafruit_BNO055 IMU;
 
 /*
     Note that the IMU has declared x axis as the yaw axis, the y axis as the
@@ -22,5 +22,4 @@ static Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
       yaw   = z axis
 */
 void readSensors(double *data);
-
 #endif
