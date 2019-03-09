@@ -58,7 +58,7 @@ struct UpdateAltitude {
         }
         return h;
     }
-} customAlt_default = {false};
+};
 
 void setupCustomAltS(UpdateAltitude* custAlt_pointer);
 
