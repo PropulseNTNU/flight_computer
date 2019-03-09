@@ -19,7 +19,6 @@ float estimates[2]; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 200; //reference_velovity
 bool firstIteration = true;
 
-
 int airbrakes_state(double data[]) {
 	return_code ret_code;
 

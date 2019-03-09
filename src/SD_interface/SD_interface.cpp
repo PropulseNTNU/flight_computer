@@ -13,13 +13,25 @@ String createDataString(double data[NUM_TYPES]){
   return dataString;
 }
 
-void write_data(double data[NUM_TYPES], const char* fileName) {
-    dataFile = SD.open(fileName, FILE_WRITE);
-    if (dataFile) {
-   		dataFile.println(createDataString(data));
-    }
-    else {
+void write_SD(double data[NUM_TYPES]) {
+  if (dataFile) {
+    dataFile.println(createDataString(data));
+    dataFile.flush();
+  }
+  else {
     Serial.println("Error opening file");
-    }
-    dataFile.close();
+  }
+}
+
+bool init_SD(const char* fileName){
+  dataFile = SD.open(fileName, O_CREAT | O_WRITE);
+  if(dataFile){
+    return true;
+  }
+  return false;
+}
+
+
+void close_SD() {
+  dataFile.close();
 }
