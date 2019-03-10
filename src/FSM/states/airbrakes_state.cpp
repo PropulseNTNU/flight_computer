@@ -6,7 +6,6 @@ using namespace std;
 #include "airbrakes_state.h"
 #include "../../servo_interface/servo_interface.h"
 #include "../../SD_interface/SD_interface.h"
-#include "Arduino.h"
 
 //initilises variables
 float error = 0; //error used in controller
