@@ -12,6 +12,7 @@ struct ApogeeArray {
     bool timerEnabled = false;
     void updateApogeeArray(ApogeeArray* alt, double currentAlt);
 };
+typedef ApogeeArray AltitudeStruct;
 
 double totalLinAcceleration(double data[]);
 

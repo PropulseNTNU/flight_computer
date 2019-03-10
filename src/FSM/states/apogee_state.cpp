@@ -11,8 +11,6 @@ using namespace std;
  
  */
 
-// CHECK Y_Vel or just pitch if it crosses 20 deg also?
-
 int apogee_state(double data[]) {
     return_code ret_code;
     

@@ -2,6 +2,10 @@
 #include "Arduino.h"
 using namespace std;
 
+/*
+ Various constants used in ApogeeDetect function
+ */
+
 const double APOGEE_ACC_VAL = 0.3;
 const double TIMER_LENGTH = 3000;
 const double APOGEE_ALTITUDE_MARGIN = 10;
@@ -16,7 +20,6 @@ void updateArray(double* altitudes, double input) {
         current = altitudes[i];
         altitudes[i] = input;
         input = current;
-        
     }
 }
 
@@ -53,8 +56,9 @@ void ApogeeArray::updateApogeeArray(ApogeeArray* alt, double currentAlt) {
     updateApogeeData(alt->apogeeData, alt->altitudes);
 }
 
+//Option to add Average difference condition - just need to experiment first.
 bool apogeeDetected(ApogeeArray* apogee, double* data) {
-    if (totalLinAcceleration(data) < APOGEE_ACC_VAL) { //Checks for low acceleration
+    if (totalLinAcceleration(data) < APOGEE_ACC_VAL ) { //Checks for low acceleration
         if (apogee->timerEnabled == false) { //Start timer
             apogee->apogeeData[TIMESTAMP_BEGIN] = data[TIMESTAMP];
             apogee->timerEnabled = true;
@@ -83,12 +87,6 @@ void printArray(double* array, int length) {
         Serial.print("\t");
     }
     Serial.println("");
-    /*
-    for (int n = 0; n < length; n++) {
-        cout << array[n];
-    }
-    cout << endl;
-    */
 }
 
 void printApogeeArray(ApogeeArray alt) {
@@ -99,10 +97,4 @@ void printApogeeArray(ApogeeArray alt) {
     Serial.print("Range: ");
     Serial.println(alt.apogeeData[RANGE]);
     printArray(alt.altitudes, 10);
-    /*
-    cout << "Max H: " << alt.maxAltitude << endl;
-    cout << "Average diff: " << alt.averageDiff << endl;
-    cout << "Range: " << alt.range << endl;
-    printArray(alt.altitudes, alt.arrayLen);
-     */
 }

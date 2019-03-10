@@ -41,7 +41,7 @@ int airbrakes_state(double data[]) {
 	}
     
     
-    getApogee()->updateApogeeArray(getApogee(), data[ALTITUDE]); //data[ALTITUDE]
+    getApogee()->updateApogeeArray(getApogee(), data[ALTITUDE]); //This updates the ApogeeArray with current altitude
 
     // remmember to update this to correct tests
 	if (apogeeDetected(getApogee(), data)) {
