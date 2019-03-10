@@ -4,11 +4,15 @@
 #include <SD.h>
 #include "../sensor_interface/sensor_data.h"
 
-String createDataString(double data[NUM_TYPES]);
+enum fileEnum {
+    DATA_FILE, AIRBRAKES_FILE, NUM_FILES
+};
 
-void write_SD(double* data);
+String createDataString(double* data);
 
-bool init_SD(const char* fileName);
+void write_SD(int file, double* data);
+
+bool init_SD(int file, const char* fileName);
 
 void close_SD();
 

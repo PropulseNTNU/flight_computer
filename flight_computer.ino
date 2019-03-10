@@ -44,7 +44,8 @@ return_code ret_code = REPEAT;
 /*
     Initialization of the data file parameters
  */
-const String fileName = "Datafile.txt";
+const String dataFileName = "DataFile.txt";
+const String airbrakesFileName = "AirbrakesFile.txt";
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
 
@@ -89,7 +90,7 @@ void setup()
   }
   else {
     delay(1000);
-    if(init_SD(fileName.c_str())){
+    if(init_SD(DATA_FILE, dataFileName.c_str()) && init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str())){
       Serial.println("Successfully opened file on SD card");
     }
     else{
@@ -103,19 +104,35 @@ void setup()
   pinMode(ARM_BUTTON_PIN, INPUT);
 
   //Delete file?
-  Serial.println("Type 'd'/'k' to delete or keep log file ");
+  Serial.println("Commands: \n 'd': delete data log \n 'ab': delete airbrakes log \n 'both': delete both logs \n 'k': to contineue ");
 
   const unsigned long startedWaiting = millis();
-  const unsigned long waitNMillis = 5000;
+  const unsigned long waitNMillis = 6000;
 
   //Option to remove file using serial for waitNMillis milliseconds
   while(millis() - startedWaiting <= waitNMillis){
     String answer;
     answer = Serial.read(); 
     if (answer == "d"){
-      SD.remove(fileName.c_str());
+      SD.remove(dataFileName.c_str());
       delay(10);
-      init_SD(fileName.c_str());
+      init_SD(DATA_FILE, dataFileName.c_str());
+      break;
+    }
+    else if (answer == "ab") {
+      SD.remove(airbrakesFileName.c_str());
+      delay(10);
+      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
+      break;
+    }
+    else if (answer == "both") {
+      SD.remove(dataFileName.c_str());
+      delay(10);
+      init_SD(DATA_FILE, dataFileName.c_str());
+      delay(10);
+      SD.remove(airbrakesFileName.c_str());
+      delay(10);
+      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
       break;
     }
     else if (answer == "k") {
@@ -152,6 +169,6 @@ void loop()
   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
       prevLogTime = millis();
-      write_SD(data);
+      write_SD(DATA_FILE, data);
   }
 }

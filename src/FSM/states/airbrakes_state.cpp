@@ -5,6 +5,7 @@ using namespace std;
 #include "../utilities/airbrakes/kalman.h"
 #include "airbrakes_state.h"
 #include "../../servo_interface/servo_interface.h"
+#include "../../SD_interface/SD_interface.h"
 
 //initilises variables
 float error = 0; //error used in controller
@@ -19,6 +20,9 @@ float estimates[2]; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 200; //reference_velovity
 bool firstIteration = true;
 
+unsigned long logInterval = 10;
+unsigned long lastLog; 
+
 int airbrakes_state(double data[]) {
 	return_code ret_code;
 
@@ -28,7 +32,7 @@ int airbrakes_state(double data[]) {
 	time_old = data[TIMESTAMP];
 
 	kalman(estimates, data[ALTITUDE], data[ACC_Z], dt, reference_v);
-	// write kalman values to file
+	
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = reference_v - estimates[1];
 	u += controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
@@ -36,6 +40,13 @@ int airbrakes_state(double data[]) {
 	// write error and controll signal too file before if statement
 	if(u >= 0 && u <= 180) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
+	}
+
+	// write values to SD card
+	if ((millis() - lastLog >= logInterval)) {
+		lastLog = millis();
+		double data[3] = {estimates[0], estimates[1], u};
+		write_SD(AIRBRAKES_FILE, data);
 	}
 
     // remmember to update this to correct tests
