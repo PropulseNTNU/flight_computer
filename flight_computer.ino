@@ -99,6 +99,9 @@ void setup()
     delay(2000); 
   }
 
+  //Calibrate BME pressure sensor to read 0m altitude at current location
+  calibrateAGL();
+
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
 
@@ -155,7 +158,4 @@ void loop()
       prevLogTime = millis();
       write_SD(data);
   }
-  
-  Serial.println(data[PRESSURE]);
-  delay(500);
 }

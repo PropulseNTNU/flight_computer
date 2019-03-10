@@ -16,6 +16,13 @@ Adafruit_BNO055* get_IMU(){
   return &IMU;
 }
 
+//Calibrate BME pressure sensor to read 0m altitude at current location.
+void calibrateAGL(){
+  Bme.readTempC();
+  float currentfloatAGL = Bme.readFloatPressure();
+  Bme.setReferencePressure(currentfloatAGL);
+}
+
 /*
     Note that the IMU has declared x axis as the yaw axis, the y axis as the
     pitch axis and the z axis as the roll axis. This is corrected as:
