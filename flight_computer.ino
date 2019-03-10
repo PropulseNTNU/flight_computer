@@ -10,10 +10,11 @@
 
 #include <Wire.h>
 #include <SD.h>
-#include "src/sensor_interface/sensor_interface.h"
-#include "src/servo_interface/servo_interface.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
+#include "src/sensor_interface/sensor_interface.h"
+#include "src/SD_interface/SD_interface.h"
+#include "src/servo_interface/servo_interface.h"
  
 /*
     Setup of adresses
@@ -42,10 +43,9 @@ state current_state = START_STATE;
 return_code ret_code = REPEAT;
 
 /*
-    Initialization of the data file
+    Initialization of the data file parameters
  */
-File dataFile;
-const String filename = "Datafile.txt";
+const String fileName = "Datafile.txt";
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
 
@@ -64,7 +64,7 @@ void setup()
   delay(500);
   
   Serial.println("Starting I2C communication with BME280");
-  if (!Bme.beginI2C())
+  if (!get_BME()->beginI2C())
   {
     Serial.println("The BME sensor did not respond. Please check wiring.");
   }
@@ -74,7 +74,7 @@ void setup()
   delay(200);
   
   Serial.println("Setting up the IMU..");
-  if (!IMU.begin())
+  if (!get_IMU()->begin())
   {
     Serial.println("The IMU sensor did not respond. Please check wiring.");
   }
@@ -90,7 +90,13 @@ void setup()
   }
   else {
     delay(1000);
-    Serial.println("SD card module successfully started");
+    if(init_SD(fileName.c_str())){
+      Serial.println("Successfully opened file on SD card");
+    }
+    else{
+      Serial.println("Successfully opened file on SD card");
+    }
+    
     delay(2000); 
   }
 
@@ -113,7 +119,9 @@ void setup()
     String answer;
     answer = Serial.read(); 
     if (answer == "d"){
-      SD.remove(filename.c_str());
+      SD.remove(fileName.c_str());
+      delay(10);
+      init_SD(fileName.c_str());
       break;
     }
     else if (answer == "k") {
@@ -125,6 +133,10 @@ void setup()
   //Setup done -> lights diode on teensy
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, HIGH);
+
+  // initi servos
+  init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN);
+
 }
 
 void loop()
@@ -139,33 +151,13 @@ void loop()
 
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
-    IMU.begin();
+    get_IMU()->begin();
     delay(100);
   }
   
-  //Starting writing to SD card when ARMED
+  //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
-    prevLogTime = millis();
-    dataFile = SD.open("Datafile.txt", FILE_WRITE);
-    if (dataFile) {
-   		dataFile.println(createDataString(data));
-    }
-    else {
-    Serial.println("Error opening file");
-    }
-    dataFile.close();
+      prevLogTime = millis();
+      write_SD(data);
   }
-  
-  Serial.println(data[BME_TEMP]);
-}
-
-String createDataString(double data[NUM_TYPES]){
-  String dataString = "";
-
-  for (int i = 0; i < NUM_TYPES; i++){
-    dataString += String(data[i]);
-    dataString += ",";
-  }
-
-  return dataString;
 }

@@ -1,3 +1,5 @@
+#ifndef SERVO_INTERFACE_H
+#define SERVO_INTERFACE_H
 #include <Servo.h>
 
 #define AIRBRAKES_SERVO_PIN 9
@@ -11,3 +13,4 @@ enum servoEnum {
 void init_servo(int servo, int pin);
 
 Servo* get_servo(int servo);
+#endif

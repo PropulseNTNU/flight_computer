@@ -1,4 +1,21 @@
 #include "sensor_interface.h"
+using namespace std;
+
+/*
+    Initialization of the BME and IMU sensor
+    BME sensor initial address 0x77, if jumper is added address is 0x76
+ */
+BME280 Bme;
+Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
+
+BME280* get_BME(){
+  return &Bme;
+}
+
+Adafruit_BNO055* get_IMU(){
+  return &IMU;
+}
+
 /*
     Note that the IMU has declared x axis as the yaw axis, the y axis as the
     pitch axis and the z axis as the roll axis. This is corrected as:
