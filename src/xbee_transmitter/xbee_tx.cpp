@@ -15,7 +15,7 @@ XBee::XBee(void* sensors, const uint8_t num_sens_bytes)
           //Setting up sleep pin
           //pinMode(SLEEP_PIN, OUTPUT);
           //digitalWrite(SLEEP_PIN, LOW);     
-          Serial.begin(9600);  
+          Serial.println("XBee initialized");
     }
 
 
@@ -28,10 +28,6 @@ void XBee::reset(void) {
 
 void XBee::transmit(void) {
     if(millis()-timer > TIMER_DELAY) {
-        Serial.print(package_number);
-        Serial.print(" ");
-        Serial.println(Serial5.availableForWrite());
-        
         Serial5.write('<');
         Serial5.write((uint8_t*)&(++package_number), sizeof(package_number));
         Serial5.write(sensors, num_sens_bytes);

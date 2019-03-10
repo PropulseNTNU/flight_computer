@@ -158,7 +158,6 @@ void loop()
       prevLogTime = millis();
       write_SD(data);
   }
-  
     xbee.transmit();
   
 }
