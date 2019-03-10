@@ -7,6 +7,7 @@ using namespace std;
  */
 BME280 Bme;
 Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
+
 GPS* gps = &GPS::getInstance();
 
 BME280* get_BME(){
@@ -17,9 +18,18 @@ Adafruit_BNO055* get_IMU(){
   return &IMU;
 }
 
+
 GPS* get_GPS() {
   return gps;
 }
+
+/*
+    Note that the IMU has declared x axis as the yaw axis, the y axis as the
+    pitch axis and the z axis as the roll axis. This is corrected as:
+      roll  = x axis
+      pitch = y axis
+      yaw   = z axis
+*/
 
 void readSensors(double *data){
   //Update BMP280 sensor data
