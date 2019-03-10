@@ -17,7 +17,7 @@ enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP,
                   GRAVITY_ACC_X,GRAVITY_ACC_Y,GRAVITY_ACC_Z, 
                   LINEAR_ACCEL_X,LINEAR_ACCEL_Y,LINEAR_ACCEL_Z,
                   QUATERNION_X, QUATERNION_Y, QUATERNION_Z, QUATERNION_W,
-                  STATE, NUM_TYPES
+                  STATE, ALTITUDE_GPS, LONGITUDE_GPS, LATITUDE_GPS, NUM_TYPES
               };
 
 #endif

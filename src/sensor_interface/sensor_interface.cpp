@@ -8,12 +8,19 @@ using namespace std;
 BME280 Bme;
 Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
 
+GPS* gps = &GPS::getInstance();
+
 BME280* get_BME(){
   return &Bme;
 }
 
 Adafruit_BNO055* get_IMU(){
   return &IMU;
+}
+
+
+GPS* get_GPS() {
+  return gps;
 }
 
 /*
@@ -23,6 +30,7 @@ Adafruit_BNO055* get_IMU(){
       pitch = y axis
       yaw   = z axis
 */
+
 void readSensors(double *data){
   //Update BMP280 sensor data
   data[BME_TEMP] = Bme.readTempC();
@@ -75,6 +83,11 @@ void readSensors(double *data){
   data[QUATERNION_Z] = quaternions.z();
   data[QUATERNION_W] = quaternions.w();
 
+  // Fetch GPS data
+  data[ALTITUDE_GPS] = gps->getAltitude();
+  data[LONGITUDE_GPS] = gps->getLongitude();
+  data[LATITUDE_GPS] = gps->getLatitude();
+  
   //data[TIMESTAMP]= event.timestamp;
   data[TIMESTAMP] = millis();
 }
