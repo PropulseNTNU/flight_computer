@@ -19,7 +19,8 @@ void write_SD(int file, double* data) {
     files[file].flush();
   }
   else {
-    Serial.println("Error writing to file");
+    Serial.print("Error writing to file: ");
+    Serial.println(file);
   }
 }
 

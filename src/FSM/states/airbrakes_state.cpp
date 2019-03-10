@@ -16,7 +16,7 @@ Parameters parameters = { 1 , 1 , 1 }; //Control parameters (Kp, Ki, Kd)
 unsigned long time_old = 0; // time variable for delta time
 
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
-float estimates[2]; //Estimates from Kalman filter. [height, velocity]
+float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 200; //reference_velovity
 bool firstIteration = true;
 
@@ -45,8 +45,8 @@ int airbrakes_state(double data[]) {
 	// write values to SD card
 	if ((millis() - lastLog >= logInterval)) {
 		lastLog = millis();
-		double data[3] = {estimates[0], estimates[1], u};
-		write_SD(AIRBRAKES_FILE, data);
+		double values[3] = {(double)estimates[0], (double)estimates[1], (double)u};
+		write_SD(AIRBRAKES_FILE, values);
 	}
 
     // remmember to update this to correct tests
