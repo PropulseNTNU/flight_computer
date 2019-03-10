@@ -4,13 +4,13 @@
  initialise globals to be used in setup & loop
  */
 
-ParachuteStateStruct parachute;
+Parachute parachute;
 AltitudeStateStruct alt;
 ApogeeArray apogee;
 
 
 //get functions
-ParachuteStateStruct* getParachute() {
+Parachute* getParachute() {
     return &parachute;
 }
 
@@ -22,6 +22,7 @@ AltitudeStateStruct* getAlt() {
     return &alt;
 }
 
+
 //initialise parachute states
 void setupParachuteS() {  //takes in p_parachute in armed state
     getParachute()->drogueDeployed = false;
@@ -31,7 +32,7 @@ void setupParachuteS() {  //takes in p_parachute in armed state
 
 //initialise altitude state
 void setupAltitudeS() { //takes in p_altitude in armed state, data_alt is altitude in data array.
-    getAlt()->isFalling = false;   //skal peke noen andre steder
+    getAlt()->isFalling = false;
     //alt_pointer->currentAltitude = data_altitude;
     getAlt()->maxAltitude = -1;
 }

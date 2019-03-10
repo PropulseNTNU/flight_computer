@@ -41,10 +41,7 @@ int airbrakes_state(double data[]) {
 	}
     
     
-    getApogee()->updateApogeeArray(getApogee(), 0); //data[ALTITUDE]
-    Serial.println("Updated apogee");
-    
-    Serial.println("Waiting for velocity input: must be less or equal to 1");
+    getApogee()->updateApogeeArray(getApogee(), data[ALTITUDE]); //data[ALTITUDE]
 
     // remmember to update this to correct tests
 	if (apogeeDetected(getApogee(), data)) {

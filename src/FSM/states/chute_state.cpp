@@ -14,7 +14,6 @@ int chute_state(double data[]) {
     return_code ret_code;
     
     if (data[ALTITUDE] <= MainServoEndAlt) {
-        
         //Stop or disconnect both motors (necessary with continuous servo)
         getParachute()->mainStopped = true;
     }
