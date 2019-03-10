@@ -8,12 +8,27 @@ using namespace std;
 BME280 Bme;
 Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
 
+GPS* gps = &GPS::getInstance();
+
 BME280* get_BME(){
   return &Bme;
 }
 
 Adafruit_BNO055* get_IMU(){
   return &IMU;
+}
+
+GPS* get_GPS() {
+  return gps;
+}
+
+//Calibrate BME pressure sensor to read 0m altitude at current location.
+//NB: Important to read temperature before reading pressure
+void calibrateAGL(){
+  Bme.readTempC();
+  float currentfloatAGL = Bme.readFloatPressure();
+  Bme.setReferencePressure(currentfloatAGL);
+
 }
 
 /*
@@ -23,8 +38,10 @@ Adafruit_BNO055* get_IMU(){
       pitch = y axis
       yaw   = z axis
 */
+
 void readSensors(double *data){
   //Update BMP280 sensor data
+  //Important to read temperature before reading pressure
   data[BME_TEMP] = Bme.readTempC();
   data[PRESSURE] = Bme.readFloatPressure();
   data[ALTITUDE] = Bme.readFloatAltitudeMeters();
@@ -75,6 +92,23 @@ void readSensors(double *data){
   data[QUATERNION_Z] = quaternions.z();
   data[QUATERNION_W] = quaternions.w();
 
+  // Fetch GPS data
+  data[ALTITUDE_GPS] = gps->getAltitude();
+  data[LONGITUDE_GPS] = gps->getLongitude();
+  data[LATITUDE_GPS] = gps->getLatitude();
+  
   //data[TIMESTAMP]= event.timestamp;
   data[TIMESTAMP] = millis();
 }
+
+/* This function is called every time new GPS-data is 
+   available at the Serial4 port */
+void serialEvent4()
+{
+    unsigned long start = millis();
+    do 
+    {
+        while (Serial4.available())
+          gps->encode(Serial4.read());
+    } while (millis() - start < GPS_MAX_WAIT_MILLI);
+  }

@@ -3,6 +3,7 @@
 
 #include "Adafruit_BNO055/Adafruit_BNO055.h"
 #include "BME280/SparkFunBME280.h"
+#include "GPS/gps.h"
 #include "sensor_data.h"
 
 const uint8_t IMU_ADDRESS = 0x28;
@@ -16,8 +17,12 @@ const uint8_t IMU_ADDRESS = 0x28;
 */
 void readSensors(double *data);
 
-BME280* get_BME();
+//Calibrate BME pressure sensor to read 0m altitude at current location.
+//NB: Important to read temperature before reading pressure.
+void calibrateAGL();
 
+BME280* get_BME();
+GPS* get_GPS();
 Adafruit_BNO055* get_IMU();
 
 #endif
