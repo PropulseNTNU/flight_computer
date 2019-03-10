@@ -14,6 +14,7 @@
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/SD_interface/SD_interface.h"
 #include "src/servo_interface/servo_interface.h"
+#include "src/xbee_transmitter/xbee_tx.h"
  
 /*
     Setup of adresses
@@ -50,6 +51,9 @@ unsigned long prevLogTime;
 
 //Init data array
 double data[NUM_TYPES];
+
+//Init xbee
+XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
 
 void setup()
 {
@@ -154,4 +158,7 @@ void loop()
       prevLogTime = millis();
       write_SD(data);
   }
+  
+    xbee.transmit();
+  
 }
