@@ -9,9 +9,9 @@
 */
 
 #include <Wire.h>
+#include "src/sensor_interface/sensor_interface.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
-#include "src/sensor_interface/sensor_interface.h"
 #include "src/SD_interface/SD_interface.h"
 #include "src/servo_interface/servo_interface.h"
  
@@ -19,7 +19,7 @@
     Setup of adresses
  */
 const uint8_t SD_CS_pin = BUILTIN_SDCARD;
-#define LED_pin 3
+#define LED_pin 13
 
 /*
     Specify the start and end state here, modify the START_STATE
@@ -100,6 +100,9 @@ void setup()
     delay(2000); 
   }
 
+  //Calibrate BME pressure sensor to read 0m altitude at current location
+  calibrateAGL();
+
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
 
@@ -171,4 +174,7 @@ void loop()
       prevLogTime = millis();
       write_SD(DATA_FILE, data);
   }
+
+  Serial.print("Current state: ");
+  Serial.println(data[STATE]);
 }
