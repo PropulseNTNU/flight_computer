@@ -5,10 +5,9 @@ This repository contains the code necessary to run the flight computer including
 
 ## Getting Started
 
-Start by making a directory flight_computer and clone this repository inside to it.
+...
 ```
 cd
-mkdir flight_computer && cd $_
 git clone https://github.com/PropulseNTNU/Flight-Computer.git
 ```
 
