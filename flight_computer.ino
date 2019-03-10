@@ -165,6 +165,9 @@ void loop()
 
   Serial.print("Current state: ");
   Serial.println(data[STATE]);
-  
+  Serial.print("Current gps altitude: ");
+  Serial.println(data[ALTITUDE_GPS]);
+  Serial.print("Current barometer altitude: ");
+  Serial.println(data[ALTITUDE]);
   xbee.transmit();
 }
