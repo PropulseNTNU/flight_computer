@@ -158,4 +158,7 @@ void loop()
       prevLogTime = millis();
       write_SD(data);
   }
+
+  Serial.print("Current state: ");
+  Serial.println(data[STATE]);
 }
