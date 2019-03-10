@@ -17,6 +17,10 @@ const uint8_t IMU_ADDRESS = 0x28;
 */
 void readSensors(double *data);
 
+//Calibrate BME pressure sensor to read 0m altitude at current location.
+//NB: Important to read temperature before reading pressure.
+void calibrateAGL();
+
 BME280* get_BME();
 GPS* get_GPS();
 Adafruit_BNO055* get_IMU();
