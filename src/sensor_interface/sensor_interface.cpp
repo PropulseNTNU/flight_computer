@@ -18,9 +18,15 @@ Adafruit_BNO055* get_IMU(){
   return &IMU;
 }
 
-
 GPS* get_GPS() {
   return gps;
+
+//Calibrate BME pressure sensor to read 0m altitude at current location.
+void calibrateAGL(){
+  Bme.readTempC();
+  float currentfloatAGL = Bme.readFloatPressure();
+  Bme.setReferencePressure(currentfloatAGL);
+
 }
 
 /*
