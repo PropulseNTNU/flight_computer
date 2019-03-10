@@ -8,9 +8,9 @@ enum fileEnum {
     DATA_FILE, AIRBRAKES_FILE, NUM_FILES
 };
 
-String createDataString(double* data);
+String createDataString(double* data, int len);
 
-void write_SD(int file, double* data);
+void write_SD(int file, double* data, int len);
 
 bool init_SD(int file, const char* fileName);
 

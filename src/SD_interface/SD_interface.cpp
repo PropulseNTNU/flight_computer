@@ -2,20 +2,18 @@
 
 File files[NUM_FILES];
 
-String createDataString(double* data){
+String createDataString(double* data, int len){
   String dataString = "";
-
-  for (int i = 0; i < NUM_TYPES; i++){
+  for (int i = 0; i < len; i++){
     dataString += String(data[i]);
     dataString += ",";
   }
-
   return dataString;
 }
 
-void write_SD(int file, double* data) {
+void write_SD(int file, double* data, int len) {
   if (files[file]) {
-    files[file].println(createDataString(data));
+    files[file].println(createDataString(data, len));
     files[file].flush();
   }
   else {

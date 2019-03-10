@@ -6,6 +6,7 @@ using namespace std;
 #include "airbrakes_state.h"
 #include "../../servo_interface/servo_interface.h"
 #include "../../SD_interface/SD_interface.h"
+#include "Arduino.h"
 
 //initilises variables
 float error = 0; //error used in controller
@@ -41,12 +42,13 @@ int airbrakes_state(double data[]) {
 	if(u >= 0 && u <= 180) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
 	}
-
+	
 	// write values to SD card
 	if ((millis() - lastLog >= logInterval)) {
 		lastLog = millis();
+		// these values may be nan during testing since the lookup table or sensors may be missing
 		double values[3] = {(double)estimates[0], (double)estimates[1], (double)u};
-		write_SD(AIRBRAKES_FILE, values);
+		write_SD(AIRBRAKES_FILE, values, 3);
 	}
 
     // remmember to update this to correct tests
