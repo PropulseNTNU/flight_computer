@@ -22,10 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "TinyGPS++.h"
 
-#ifndef BUFFER_SENTENCES
-#define BUFFER_SENTENCES 4
-#endif
-
 #ifndef GPS_BAUDRATE
 #define GPS_BAUDRATE 9600
 #endif
@@ -66,8 +62,6 @@ private:
     GPS() {}
     GPS(GPS const&);
     void operator=(GPS const&);
-    char* nmeaBuffer[]; // Buffer for NMEA sentences
-    unsigned int bufferSentences; // Number of NMEA sentences to store in buffer2
 
     HardwareSerial* gpsSerial; /* Serial object for uart communication with gps.
                            Serial4 must be used, pins Rx->31 Tx->32 on the Teensy3.6,
