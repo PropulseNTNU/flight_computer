@@ -1,5 +1,4 @@
 #include "sensor_interface.h"
-using namespace std;
 
 /*
     Initialization of the BME and IMU sensor
@@ -38,7 +37,6 @@ void calibrateAGL(){
       pitch = y axis
       yaw   = z axis
 */
-
 void readSensors(double *data){
   //Update BMP280 sensor data
   //Important to read temperature before reading pressure

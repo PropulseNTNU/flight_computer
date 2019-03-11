@@ -9,11 +9,11 @@
 */
 
 #include <Wire.h>
-#include "src/sensor_interface/sensor_interface.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
 #include "src/SD_interface/SD_interface.h"
 #include "src/servo_interface/servo_interface.h"
+#include "src/sensor_interface/sensor_interface.h"
  
 /*
     Setup of adresses

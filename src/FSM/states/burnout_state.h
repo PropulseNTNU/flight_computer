@@ -1,6 +1,5 @@
 #ifndef BURNOUT_STATE_H
 #define BURNOUT_STATE_H
-#include <Arduino.h>
 
 /*
 	Comment what this function does.

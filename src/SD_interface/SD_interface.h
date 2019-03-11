@@ -2,7 +2,6 @@
 #define SD_INTERFACE_H
 
 #include <SD.h>
-#include "../sensor_interface/sensor_data.h"
 
 enum fileEnum {
     DATA_FILE, AIRBRAKES_FILE, NUM_FILES

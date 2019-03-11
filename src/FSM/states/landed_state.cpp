@@ -1,4 +1,3 @@
-using namespace std;
 #include "../states.h"
 
 //Does nothing

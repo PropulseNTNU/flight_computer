@@ -1,9 +1,7 @@
-using namespace std;
 #include "../states.h"
 #include "../utilities/airbrakes/controll.h"
 #include "../utilities/airbrakes/interpolation.h"
 #include "../utilities/airbrakes/kalman.h"
-#include "airbrakes_state.h"
 #include "../../servo_interface/servo_interface.h"
 #include "../../SD_interface/SD_interface.h"
 
