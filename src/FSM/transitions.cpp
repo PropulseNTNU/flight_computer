@@ -1,5 +1,4 @@
 #include "transitions.h"
-#include "states.h"
 
 /*
 	First element in array is the source state. The second

@@ -1,10 +1,11 @@
 #ifndef SENSOR_INTERFACE_H
 #define SENSOR_INTERFACE_H
 
+#include "sensor_data.h"
 #include "Adafruit_BNO055/Adafruit_BNO055.h"
 #include "BME280/SparkFunBME280.h"
 #include "GPS/gps.h"
-#include "sensor_data.h"
+
 
 const uint8_t IMU_ADDRESS = 0x28;
 

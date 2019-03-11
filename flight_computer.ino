@@ -9,13 +9,13 @@
 */
 
 #include <Wire.h>
-#include "src/sensor_interface/sensor_interface.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
 #include "src/SD_interface/SD_interface.h"
 #include "src/servo_interface/servo_interface.h"
+#include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
- 
+
 /*
     Setup of adresses
  */
@@ -26,7 +26,7 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
     Specify the start and end state here, modify the START_STATE
     to the state function you would like to test.
 */
-#define START_STATE IDLE
+#define START_STATE BURNOUT
 #define END_STATE LANDED
 
 /*
@@ -43,9 +43,11 @@ state current_state = START_STATE;
 return_code ret_code = REPEAT;
 
 /*
-    Initialization of the data file parameters
+    Initialization of the data file names.
+    IMPORTANT!!!: If the names are too long you will fail to write to the file.......(use short file names)
  */
-const String fileName = "Datafile.txt";
+const String dataFileName = "DataFile.txt";
+const String airbrakesFileName = "AbFile.txt";
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
 
@@ -93,8 +95,8 @@ void setup()
   }
   else {
     delay(1000);
-    if(init_SD(fileName.c_str())){
-      Serial.println("Successfully opened file on SD card");
+    if(init_SD(DATA_FILE, dataFileName.c_str()) && init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str())){
+      Serial.println("Successfully opened file(s) on SD card");
     }
     else{
       Serial.println("Successfully opened file on SD card");
@@ -110,20 +112,40 @@ void setup()
   pinMode(ARM_BUTTON_PIN, INPUT);
 
   //Delete file?
-  Serial.println("Type 'd'/'k' to delete or keep log file ");
+  Serial.println("Commands: \n 'd': delete data log \n 'a': delete airbrakes log \n 'b': delete both logs \n 'k': to contineue ");
 
   const unsigned long startedWaiting = millis();
-  const unsigned long waitNMillis = 5000;
+  const unsigned long waitNMillis = 10000;
 
   //Option to remove file using serial for waitNMillis milliseconds
   while(millis() - startedWaiting <= waitNMillis){
     String answer;
+    //since serial read only reads one byte at a time we can't use codes longer than one letter
+    //look into using readline in the future.
     answer = Serial.read(); 
     if (answer == "d"){
-      SD.remove(fileName.c_str());
+      SD.remove(dataFileName.c_str());
       delay(10);
-      init_SD(fileName.c_str());
+      init_SD(DATA_FILE, dataFileName.c_str());
+      Serial.print("Deleted data file.");
+      break;
+    }
+    else if (answer == "a") {
+      SD.remove(airbrakesFileName.c_str());
       delay(10);
+      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
+      Serial.print("Deleted airbrakes file.");
+      break;
+    }
+    else if (answer == "b") {
+      SD.remove(dataFileName.c_str());
+      delay(10);
+      init_SD(DATA_FILE, dataFileName.c_str());
+      delay(10);
+      SD.remove(airbrakesFileName.c_str());
+      delay(10);
+      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
+      Serial.print("Deleted both files.");
       break;
     }
     else if (answer == "k") {
@@ -160,7 +182,7 @@ void loop()
   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
       prevLogTime = millis();
-      write_SD(data);
+      write_SD(DATA_FILE, data, NUM_TYPES);
   }
 
   Serial.print("Current state: ");
