@@ -1,6 +1,4 @@
-using namespace std;
 #include "../states.h"
-#include <Arduino.h>
 
 void runEntry();
 bool entry_ran = false;

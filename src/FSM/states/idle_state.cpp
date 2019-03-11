@@ -1,6 +1,4 @@
-using namespace std;
 #include "../states.h"
-#include <Arduino.h>
 
 //Only the arm button should trigger next state
 int idle_state(double data[]) {

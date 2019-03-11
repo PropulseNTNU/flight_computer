@@ -1,4 +1,3 @@
-using namespace std;
 #include "../states.h"
 #include "../utilities/recovery/recovery.h"
 #include "../../servo_interface/servo_interface.h"

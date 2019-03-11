@@ -1,9 +1,11 @@
-using namespace std;
 #include "../states.h"
+<<<<<<< HEAD
 #include "../utilities/recovery/recovery.h"
 #include "../../servo_interface/servo_interface.h"
 #include "drogue_state.h"
 #include <Arduino.h>
+=======
+>>>>>>> 37a58a340beb604752c2d6923f38549074f0c750
 
 /*
  

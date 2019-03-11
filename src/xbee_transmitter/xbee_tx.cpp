@@ -1,5 +1,5 @@
 #include "xbee_tx.h"
-#include <arduino.h>
+#include <Arduino.h>
 
 
 XBee::XBee(void* sensors, const uint8_t num_sens_bytes) 

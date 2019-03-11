@@ -1,4 +1,3 @@
-using namespace std;
 #include "../states.h"
 
 double last_acc_z = 0;
