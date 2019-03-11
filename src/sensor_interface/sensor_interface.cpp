@@ -98,3 +98,15 @@ void readSensors(double *data){
   //data[TIMESTAMP]= event.timestamp;
   data[TIMESTAMP] = millis();
 }
+
+/* This function is called every time new GPS-data is 
+   available at the Serial4 port */
+void serialEvent4()
+{
+    unsigned long start = millis();
+    do 
+    {
+        while (Serial4.available())
+          gps->encode(Serial4.read());
+    } while (millis() - start < GPS_MAX_WAIT_MILLI);
+  }

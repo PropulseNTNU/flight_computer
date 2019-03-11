@@ -14,7 +14,8 @@
 #include "src/SD_interface/SD_interface.h"
 #include "src/servo_interface/servo_interface.h"
 #include "src/sensor_interface/sensor_interface.h"
- 
+#include "src/xbee_transmitter/xbee_tx.h"
+
 /*
     Setup of adresses
  */
@@ -52,6 +53,9 @@ unsigned long prevLogTime;
 
 //Init data array
 double data[NUM_TYPES];
+
+//Init xbee
+XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
 
 void setup()
 {
@@ -183,4 +187,9 @@ void loop()
 
   Serial.print("Current state: ");
   Serial.println(data[STATE]);
+  Serial.print("Current gps altitude: ");
+  Serial.println(data[ALTITUDE_GPS]);
+  Serial.print("Current barometer altitude: ");
+  Serial.println(data[ALTITUDE]);
+  xbee.transmit();
 }
