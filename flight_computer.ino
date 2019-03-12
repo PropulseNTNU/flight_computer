@@ -28,7 +28,6 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
     to the state function you would like to test.
 */
 #define START_STATE IDLE
-#define START_STATE BURNOUT
 #define END_STATE LANDED
 
 /*
@@ -114,7 +113,7 @@ void setup()
   pinMode(ARM_BUTTON_PIN, INPUT);
 
   //Delete file?
-  Serial.println("Commands: \n 'd': delete data log \n 'a': delete airbrakes log \n 'b': delete both logs \n 'k': to contineue ");
+  Serial.println("Commands: \n 'd': delete data log \n 'a': delete airbrakes log \n 'b': delete both logs \n 'k': to continue ");
 
   const unsigned long startedWaiting = millis();
   const unsigned long waitNMillis = 10000;
