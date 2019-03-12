@@ -26,7 +26,7 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
     Specify the start and end state here, modify the START_STATE
     to the state function you would like to test.
 */
-#define START_STATE AIRBRAKES
+#define START_STATE IDLE
 #define END_STATE LANDED
 
 /*
@@ -50,7 +50,7 @@ const String dataFileName = "DataFile.txt";
 const String airbrakesFileName = "AbFile.txt";
 const String recoveryFileName = "RecFile.txt";
 
-/* Moved globals to SD_interface.cpp
+/* Moved globals to SD_interface.cpp, remove when reviewed by master branch
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
 */
