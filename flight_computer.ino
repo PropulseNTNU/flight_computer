@@ -26,7 +26,7 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
     Specify the start and end state here, modify the START_STATE
     to the state function you would like to test.
 */
-#define START_STATE IDLE
+#define START_STATE AIRBRAKES
 #define END_STATE LANDED
 
 /*

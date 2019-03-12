@@ -6,9 +6,7 @@ using namespace std;
  Various constants used in ApogeeDetect function
  */
 
-const double APOGEE_ACC_VAL = 0.3;
-const double TIMER_LENGTH = 3000;
-const double APOGEE_ALTITUDE_MARGIN = 10;
+
 
 double totalLinAcceleration (double* data) {
     return sqrt(sq(data[LINEAR_ACCEL_X])+sq(LINEAR_ACCEL_Y)+sq(LINEAR_ACCEL_Z));
@@ -16,7 +14,10 @@ double totalLinAcceleration (double* data) {
 
 void updateArray(double* altitudes, double input) {
     double current;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < ARRAY_LEN; i++) {
+        if (isnan(input)) {
+            input = altitudes[i+1];
+        }
         current = altitudes[i];
         altitudes[i] = input;
         input = current;
@@ -26,19 +27,17 @@ void updateArray(double* altitudes, double input) {
 void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     double sumDiff = 0;
     double diff = 0;
+    double sumAlt = 0;
     double min = 999999999;
     double max = -1;
-    for (int i = 0; i < 10; i++) {
-        if (altitudes[i] > apogeeDataArray[MAX_ALTITUDE]) {
-            apogeeDataArray[MAX_ALTITUDE] = altitudes[i];
-        }
+    for (int i = 0; i < ARRAY_LEN; i++) {
         if (altitudes[i] > max) {
             max = altitudes[i];
         }
         if (altitudes[i] < min) {
             min = altitudes[i];
         }
-        if (i < 9) {
+        if (i < ARRAY_LEN-1) {
             diff = (altitudes[i] - altitudes[i+1]);
             if (diff > 0) {
                 sumDiff += diff;
@@ -46,9 +45,15 @@ void updateApogeeData(double* apogeeDataArray, double* altitudes) {
                 sumDiff += -(diff);
             }
         }
+        sumAlt += altitudes[i];
     }
+    apogeeDataArray[AVERAGE_ALTITUDE] = sumAlt/ARRAY_LEN;
     apogeeDataArray[RANGE] = max-min;
-    apogeeDataArray[AVERAGE_DIFF] = sumDiff/10;
+    apogeeDataArray[AVERAGE_DIFF] = sumDiff/ARRAY_LEN;
+    
+    if (apogeeDataArray[AVERAGE_ALTITUDE] > apogeeDataArray[MAX_ALTITUDE]) {
+        apogeeDataArray[MAX_ALTITUDE] = apogeeDataArray[AVERAGE_ALTITUDE];
+    }
 }
 
 void ApogeeArray::updateApogeeArray(ApogeeArray* alt, double currentAlt) {
@@ -67,7 +72,7 @@ bool apogeeDetected(ApogeeArray* apogee, double* data) {
             return true;
         } else {
             if (totalLinAcceleration(data) < APOGEE_ACC_VAL/2) { //Very low acc -> timer length halved
-                if (apogee->timerEnabled && (data[TIMESTAMP] - apogee->apogeeData[TIMESTAMP_BEGIN] > TIMER_LENGTH/2)) {
+                if (apogee->timerEnabled && (data[TIMESTAMP] - apogee->apogeeData[TIMESTAMP_BEGIN] > TIMER_LENGTH/3)) {
                     return true;
                 }
             } else { //Timer elapsed? Apogee.
@@ -81,8 +86,8 @@ bool apogeeDetected(ApogeeArray* apogee, double* data) {
 }
 
 
-void printArray(double* array, int length) {
-    for (int n = 0; n < length; n++) {
+void printArray(double* array) {
+    for (int n = 0; n < ARRAY_LEN; n++) {
         Serial.print(array[n]);
         Serial.print("\t");
     }
@@ -92,9 +97,11 @@ void printArray(double* array, int length) {
 void printApogeeArray(ApogeeArray alt) {
     Serial.print("Max H: ");
     Serial.println(alt.apogeeData[MAX_ALTITUDE]);
+    Serial.print("Average altitude: ");
+    Serial.println(alt.apogeeData[AVERAGE_ALTITUDE]);
     Serial.print("Average diff: ");
     Serial.println(alt.apogeeData[AVERAGE_DIFF]);
     Serial.print("Range: ");
     Serial.println(alt.apogeeData[RANGE]);
-    printArray(alt.altitudes, 10);
+    printArray(alt.altitudes);
 }

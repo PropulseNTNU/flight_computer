@@ -51,6 +51,11 @@ int airbrakes_state(double data[]) {
 		double values[3] = {(double)estimates[0], (double)estimates[1], (double)u};
 		write_SD(AIRBRAKES_FILE, values, 3);
 	}
+    
+    
+    
+    
+    printApogeeArray(*getApogee());
 
     // remmember to update this to correct tests
 	if (apogeeDetected(getApogee(), data)) {
