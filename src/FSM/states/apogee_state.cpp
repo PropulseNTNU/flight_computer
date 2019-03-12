@@ -1,7 +1,8 @@
 #include "../states.h"
+#include "apogee_state.h"
 #include "../utilities/recovery/recovery.h"
 #include "../../servo_interface/servo_interface.h"
-#include "apogee_state.h"
+#include "../../SD_interface/SD_interface.h"
 #include <Arduino.h>
 
 /*
@@ -17,6 +18,8 @@ int apogee_state(double data[]) {
         get_servo(DROGUE_SERVO)->write(5);
         getParachute()->drogueDeployed = true;
     }
+    
+    write_SD(RECOVERY_FILE, getApogee()->apogeeData, 6);
     
     if (getParachute()->drogueDeployed) {
         ret_code = NEXT;

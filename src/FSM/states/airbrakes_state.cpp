@@ -20,8 +20,12 @@ float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 200; //reference_velovity
 bool firstIteration = true;
 
+/* Using globals defined in SD_interface.cpp instead
+ 
 unsigned long logInterval = 10;
-unsigned long lastLog; 
+unsigned long lastLog;
+ 
+*/
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
@@ -44,18 +48,16 @@ int airbrakes_state(double data[]) {
     
     getApogee()->updateApogeeArray(getApogee(), data[ALTITUDE]); //This updates the ApogeeArray with current altitude
 	
-	// write values to SD card
-	if ((millis() - lastLog >= logInterval)) {
-		lastLog = millis();
+	// write values from both airbrakes and recovery to SD card
+	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
+		setLastLog(millis(), COMMON_LASTLOG);
 		// these values may be nan during testing since the lookup table or sensors may be missing
 		double values[3] = {(double)estimates[0], (double)estimates[1], (double)u};
 		write_SD(AIRBRAKES_FILE, values, 3);
+        
+        // writing recovery values
+        write_SD(RECOVERY_FILE, getApogee()->apogeeData, 6);
 	}
-    
-    
-    
-    
-    printApogeeArray(*getApogee());
 
     // remmember to update this to correct tests
 	if (apogeeDetected(getApogee(), data)) {

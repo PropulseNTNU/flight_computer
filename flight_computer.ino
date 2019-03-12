@@ -48,8 +48,12 @@ return_code ret_code = REPEAT;
  */
 const String dataFileName = "DataFile.txt";
 const String airbrakesFileName = "AbFile.txt";
+const String recoveryFileName = "RecFile.txt";
+
+/* Moved globals to SD_interface.cpp
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
+*/
 
 //Init data array
 double data[NUM_TYPES];
@@ -95,7 +99,9 @@ void setup()
   }
   else {
     delay(1000);
-    if(init_SD(DATA_FILE, dataFileName.c_str()) && init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str())){
+    if(init_SD(DATA_FILE, dataFileName.c_str()) 
+      && init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str()) 
+      && init_SD(RECOVERY_FILE, recoveryFileName.c_str())) {
       Serial.println("Successfully opened file(s) on SD card");
     }
     else{
@@ -112,7 +118,7 @@ void setup()
   pinMode(ARM_BUTTON_PIN, INPUT);
 
   //Delete file?
-  Serial.println("Commands: \n 'd': delete data log \n 'a': delete airbrakes log \n 'b': delete both logs \n 'k': to continue ");
+  Serial.println("Commands: \n 'd': delete data log \n 'a': delete airbrakes log \n 'r': delete recovery log \n 'e': delete every log \n 'k': to continue");
 
   const unsigned long startedWaiting = millis();
   const unsigned long waitNMillis = 10000;
@@ -137,7 +143,14 @@ void setup()
       Serial.print("Deleted airbrakes file.");
       break;
     }
-    else if (answer == "b") {
+    else if (answer == "r"){
+      SD.remove(recoveryFileName.c_str());
+      delay(10);
+      init_SD(RECOVERY_FILE, recoveryFileName.c_str());
+      Serial.print("Deleted recovery file.");
+      break;
+    }
+    else if (answer == "e") {
       SD.remove(dataFileName.c_str());
       delay(10);
       init_SD(DATA_FILE, dataFileName.c_str());
@@ -145,7 +158,10 @@ void setup()
       SD.remove(airbrakesFileName.c_str());
       delay(10);
       init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
-      Serial.print("Deleted both files.");
+      SD.remove(recoveryFileName.c_str());
+      delay(10);
+      init_SD(RECOVERY_FILE, recoveryFileName.c_str());
+      Serial.print("Deleted every file.");
       break;
     }
     else if (answer == "k") {
@@ -181,8 +197,8 @@ void loop()
   }
   
   //Starting writing to SD card when ARMED 
-  if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
-      prevLogTime = millis();
+  if ((current_state >= ARMED) && (millis() - *getLastLog(DATA_LASTLOG) >= *getLogInterval(DATA_INTERVAL))) {
+      setLastLog(millis(), DATA_LASTLOG);
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
 

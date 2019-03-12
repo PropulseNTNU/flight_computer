@@ -30,6 +30,8 @@ void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     double sumAlt = 0;
     double min = 999999999;
     double max = -1;
+    //HERE
+    static int counter = 0;
     for (int i = 0; i < ARRAY_LEN; i++) {
         if (altitudes[i] > max) {
             max = altitudes[i];
@@ -54,6 +56,8 @@ void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     if (apogeeDataArray[AVERAGE_ALTITUDE] > apogeeDataArray[MAX_ALTITUDE]) {
         apogeeDataArray[MAX_ALTITUDE] = apogeeDataArray[AVERAGE_ALTITUDE];
     }
+        //HERE
+    apogeeDataArray[TIMESTAMP_APOGEE] = counter++;
 }
 
 void ApogeeArray::updateApogeeArray(ApogeeArray* alt, double currentAlt) {
@@ -69,14 +73,17 @@ bool apogeeDetected(ApogeeArray* apogee, double* data) {
             apogee->timerEnabled = true;
         }
         if ((apogee->apogeeData[MAX_ALTITUDE] - apogee->apogeeData[AVERAGE_ALTITUDE]) < APOGEE_ALTITUDE_MARGIN) { //Descending -> apogee
+            apogee->apogeeData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
             return true;
         } else {
             if (totalLinAcceleration(data) < APOGEE_ACC_VAL/2) { //Very low acc -> timer length halved
                 if (apogee->timerEnabled && (data[TIMESTAMP] - apogee->apogeeData[TIMESTAMP_BEGIN] > TIMER_LENGTH/3)) {
+                    apogee->apogeeData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
                     return true;
                 }
             } else { //Timer elapsed? Apogee.
                 if (apogee->timerEnabled && (data[TIMESTAMP] - apogee->apogeeData[TIMESTAMP_BEGIN] > TIMER_LENGTH)) {
+                    apogee->apogeeData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
                     return true;
                 }
             }

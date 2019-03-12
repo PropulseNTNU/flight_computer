@@ -1,7 +1,8 @@
 #include "../states.h"
+#include "drogue_state.h"
 #include "../utilities/recovery/recovery.h"
 #include "../../servo_interface/servo_interface.h"
-#include "drogue_state.h"
+#include "../../SD_interface/SD_interface.h"
 #include <Arduino.h>
 
 /*
@@ -20,6 +21,13 @@ int drogue_state(double data[]) {
     if ((!getParachute()->mainDeployed) && (getApogee()->apogeeData[AVERAGE_ALTITUDE] <= MainChuteALT)) {
         get_servo(MAIN_SERVO)->write(5);
         getParachute()->mainDeployed = true;
+    }
+    
+    //Write to SD card
+    if ((millis() - *getLastLog(COMMON_LASTLOG) >= *getLogInterval(DROGUE_INTERVAL))) {
+        setLastLog(millis(), COMMON_LASTLOG);
+        // writing recovery values
+        write_SD(RECOVERY_FILE, getApogee()->apogeeData, 6);
     }
     
     if (getParachute()->mainDeployed) {

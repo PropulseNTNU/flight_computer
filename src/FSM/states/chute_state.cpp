@@ -1,6 +1,7 @@
 #include "../states.h"
-#include "../utilities/recovery/recovery.h"
 #include "chute_state.h"
+#include "../utilities/recovery/recovery.h"
+#include "../../SD_interface/SD_interface.h"
 #include <Arduino.h>
 
 /*
@@ -19,6 +20,13 @@ int chute_state(double data[]) {
     if (getApogee()->apogeeData[AVERAGE_ALTITUDE]  <= MainServoEndAlt) {
         //Stop or disconnect both motors (necessary with continuous servo)
         getParachute()->mainStopped = true;
+    }
+    
+    //Write to SD card
+    if ((millis() - *getLastLog(COMMON_LASTLOG) >= *getLogInterval(CHUTE_INTERVAL))) {
+        setLastLog(millis(), COMMON_LASTLOG);
+        // writing recovery values
+        write_SD(RECOVERY_FILE, getApogee()->apogeeData, 6);
     }
     
     if (data[ALTITUDE] <= 5) {
