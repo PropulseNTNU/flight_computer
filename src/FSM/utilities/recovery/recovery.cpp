@@ -1,0 +1,40 @@
+#include "recovery.h"
+#include "../../../servo_interface/servo_interface.h"
+#include "../../../SD_interface/SD_interface.h"
+
+
+/*
+ Declare globals
+ */
+
+Parachute parachute;
+ApogeeArray apogee;
+
+
+//Get functions
+Parachute* getParachute() {
+    return &parachute;
+}
+
+ApogeeArray* getApogee() {
+    return &apogee;
+}
+
+AltitudeStruct* getAltitudeStruct() {
+    return &apogee;
+}
+
+//Ensures deployment of parachutes by stacking write signal. (Necessary? Not sure.)
+void deployDrogueChute(double timestamp) {
+    for (int i = 0; i < DEPLOY_ATTEMPTS; i++) {
+        get_servo(DROGUE_SERVO)->write(5);
+    }
+    getAltitudeStruct()->recoveryData[TIMESTAMP_DROGUE] = timestamp;
+}
+
+void deployMainChute(double timestamp) {
+    for (int i = 0; i < DEPLOY_ATTEMPTS; i++) {
+    get_servo(MAIN_SERVO)->write(5);
+    }
+    getAltitudeStruct()->recoveryData[TIMESTAMP_MAIN] = timestamp;
+}

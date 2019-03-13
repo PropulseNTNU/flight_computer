@@ -2,6 +2,9 @@
 
 File files[NUM_FILES];
 
+unsigned long logIntervals[NUM_INTERVALS] = {10, 10, 100, 1000};
+unsigned long lastLog[NUM_LASTLOGS];
+
 String createDataString(double* data, int len){
   String dataString = "";
   for (int i = 0; i < len; i++){
@@ -34,4 +37,16 @@ void close_SD() {
   for(int i = 0; i < NUM_FILES; i++){
     files[i].close();
   }
+}
+
+unsigned long* getLogInterval(int interval) {
+    return &logIntervals[interval];
+}
+
+unsigned long* getLastLog(int lastLogType) {
+    return &lastLog[lastLogType];
+}
+
+void setLastLog(unsigned long newLastLog, int lastLogType) {
+    lastLog[lastLogType] = newLastLog;
 }
