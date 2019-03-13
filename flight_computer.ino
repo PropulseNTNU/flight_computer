@@ -182,7 +182,18 @@ void setup()
 
 void loop()
 { 
-  readSensors(data);
+  //readSensors(data);
+
+  updateSensorData(data);
+
+  Serial.print("t_h");
+  Serial.println(data[ALTITUDE]);
+
+  Serial.print("t_a");
+  Serial.println(data[ACC_Z]);
+
+  Serial.print("curr_state");
+  Serial.println(data[STATE]);
   
   //Running the state machine
   state_function = state_funcs[current_state];
