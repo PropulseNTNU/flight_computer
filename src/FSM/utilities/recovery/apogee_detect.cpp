@@ -9,7 +9,7 @@ using namespace std;
 
 
 double totalLinAcceleration (double* data) {
-    return sqrt(sq(data[LINEAR_ACCEL_X])+sq(LINEAR_ACCEL_Y)+sq(LINEAR_ACCEL_Z));
+    return sqrt(sq(data[LINEAR_ACCEL_X])+sq(data[LINEAR_ACCEL_Y])+sq(data[LINEAR_ACCEL_Y]));
 }
 
 void updateArray(double* altitudes, double input) {
@@ -56,30 +56,35 @@ void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     }
 }
 
-void ApogeeArray::updateApogeeArray(ApogeeArray* alt, double currentAlt) {
-    updateArray(alt->altitudes, currentAlt);
-    updateApogeeData(alt->apogeeData, alt->altitudes);
+void ApogeeArray::updateDataArray(ApogeeArray* alt, double* data) {
+    updateArray(alt->altitudes, data[ALTITUDE]);
+    updateApogeeData(alt->recoveryData, alt->altitudes);
+    alt->recoveryData[TOTAL_LIN_ACC] = totalLinAcceleration(data);
 }
 
 //Option to add Average difference condition - just need to experiment first.
 bool apogeeDetected(ApogeeArray* apogee, double* data) {
-    if (totalLinAcceleration(data) < APOGEE_ACC_VAL ) { //Checks for low acceleration
+    double linAccMagnitude = totalLinAcceleration(data); //Magnitude of linear acceleration in x,y,z
+    if (linAccMagnitude < APOGEE_ACC_VAL ) { //Checks for low acceleration
         if (apogee->timerEnabled == false) { //Start timer
-            apogee->apogeeData[TIMESTAMP_BEGIN] = data[TIMESTAMP];
+            apogee->recoveryData[TIMESTAMP_BEGIN_TIMER] = data[TIMESTAMP];
             apogee->timerEnabled = true;
         }
-        if ((apogee->apogeeData[MAX_ALTITUDE] - apogee->apogeeData[AVERAGE_ALTITUDE]) < APOGEE_ALTITUDE_MARGIN) { //Descending -> apogee
-            apogee->apogeeData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
+        if ((apogee->recoveryData[MAX_ALTITUDE] - apogee->recoveryData[AVERAGE_ALTITUDE]) < APOGEE_ALTITUDE_MARGIN) { //Descending -> apogee
+            apogee->recoveryData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
+            apogee->recoveryData[TOTAL_LIN_ACC_APOGEE] = linAccMagnitude;
             return true;
         } else {
-            if (totalLinAcceleration(data) < APOGEE_ACC_VAL/2) { //Very low acc -> timer length halved
-                if (apogee->timerEnabled && (data[TIMESTAMP] - apogee->apogeeData[TIMESTAMP_BEGIN] > TIMER_LENGTH/3)) {
-                    apogee->apogeeData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
+            if (totalLinAcceleration(data) < APOGEE_ACC_VAL/2) { //Very low acc -> timer length reduced to a third
+                if (apogee->timerEnabled && (data[TIMESTAMP] - apogee->recoveryData[TIMESTAMP_BEGIN_TIMER] > TIMER_LENGTH/3)) {
+                    apogee->recoveryData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
+                    apogee->recoveryData[TOTAL_LIN_ACC_APOGEE] = linAccMagnitude;
                     return true;
                 }
             } else { //Timer elapsed? Apogee.
-                if (apogee->timerEnabled && (data[TIMESTAMP] - apogee->apogeeData[TIMESTAMP_BEGIN] > TIMER_LENGTH)) {
-                    apogee->apogeeData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
+                if (apogee->timerEnabled && (data[TIMESTAMP] - apogee->recoveryData[TIMESTAMP_BEGIN_TIMER] > TIMER_LENGTH)) {
+                    apogee->recoveryData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
+                    apogee->recoveryData[TOTAL_LIN_ACC_APOGEE] = linAccMagnitude;
                     return true;
                 }
             }
@@ -99,12 +104,12 @@ void printArray(double* array) {
 
 void printApogeeArray(ApogeeArray alt) {
     Serial.print("Max H: ");
-    Serial.println(alt.apogeeData[MAX_ALTITUDE]);
+    Serial.println(alt.recoveryData[MAX_ALTITUDE]);
     Serial.print("Average altitude: ");
-    Serial.println(alt.apogeeData[AVERAGE_ALTITUDE]);
+    Serial.println(alt.recoveryData[AVERAGE_ALTITUDE]);
     Serial.print("Average diff: ");
-    Serial.println(alt.apogeeData[AVERAGE_DIFF]);
+    Serial.println(alt.recoveryData[AVERAGE_DIFF]);
     Serial.print("Range: ");
-    Serial.println(alt.apogeeData[RANGE]);
+    Serial.println(alt.recoveryData[RANGE]);
     printArray(alt.altitudes);
 }

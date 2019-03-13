@@ -1,7 +1,6 @@
 #include "../states.h"
 #include "drogue_state.h"
 #include "../utilities/recovery/recovery.h"
-#include "../../servo_interface/servo_interface.h"
 #include "../../SD_interface/SD_interface.h"
 #include <Arduino.h>
 
@@ -15,11 +14,11 @@ int drogue_state(double data[]) {
     return_code ret_code;
     
     //This updates the altitude array with current altitude, done here to access altitude table.
-    getApogee()->updateApogeeArray(getApogee(), data[ALTITUDE]);
+    getAltitudeStruct()->updateDataArray(getAltitudeStruct(), data);
     
     //Criteria directly based on average altitude (last 10 measurements) being less than 457m.
-    if ((!getParachute()->mainDeployed) && (getApogee()->apogeeData[AVERAGE_ALTITUDE] <= MainChuteALT)) {
-        get_servo(MAIN_SERVO)->write(5);
+    if ((!getParachute()->mainDeployed) && (getAltitudeStruct()->recoveryData[AVERAGE_ALTITUDE] <= MainChuteALT)) {
+        deployMainChute(data[TIMESTAMP]);
         getParachute()->mainDeployed = true;
     }
     
@@ -27,7 +26,7 @@ int drogue_state(double data[]) {
     if ((millis() - *getLastLog(COMMON_LASTLOG) >= *getLogInterval(DROGUE_INTERVAL))) {
         setLastLog(millis(), COMMON_LASTLOG);
         // writing recovery values
-        write_SD(RECOVERY_FILE, getApogee()->apogeeData, 6);
+        write_SD(RECOVERY_FILE, getAltitudeStruct()->recoveryData, RECOVERY_DATA_LEN);
     }
     
     if (getParachute()->mainDeployed) {

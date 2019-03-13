@@ -46,7 +46,7 @@ int airbrakes_state(double data[]) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
 	}
     
-    getApogee()->updateApogeeArray(getApogee(), data[ALTITUDE]); //This updates the ApogeeArray with current altitude
+    getApogee()->updateDataArray(getApogee(), data); //This updates the ApogeeArray with current altitude
 	
 	// write values from both airbrakes and recovery to SD card
 	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
@@ -56,7 +56,7 @@ int airbrakes_state(double data[]) {
 		write_SD(AIRBRAKES_FILE, values, 3);
         
         // writing recovery values
-        write_SD(RECOVERY_FILE, getApogee()->apogeeData, 6);
+        write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
 	}
 
     // remmember to update this to correct tests

@@ -8,6 +8,7 @@
 #define DrogueServoPin 2
 #define MainServoPin 3
 #define MainChuteALT 457
+#define DEPLOY_ATTEMPTS 2
 
 struct ParachuteStateStruct {
     bool drogueDeployed = false; //type uint8_t = 1 byte
@@ -23,7 +24,12 @@ typedef struct ParachuteStateStruct Parachute;
  bool parachute_state[NUM_TYPES]; //to access bool variables, then instead of struct pointer we can use array pointer.
  */
 
-ApogeeArray* getApogee();
 ParachuteStateStruct* getParachute();
+ApogeeArray* getApogee();
+AltitudeStruct* getAltitudeStruct(); //Alias for getApogee()
+
+//Deploys parachutes in apogee_state and drogue_state.
+void deployDrogueChute(double timestamp);
+void deployMainChute(double timestamp);
 
 #endif /* recovery_h */

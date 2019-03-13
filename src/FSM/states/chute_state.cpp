@@ -15,10 +15,12 @@ int chute_state(double data[]) {
     return_code ret_code;
     
     //This updates the altitude array with current altitude, done here to access altitude table.
-    getApogee()->updateApogeeArray(getApogee(), data[ALTITUDE]);
+    getAltitudeStruct()->updateDataArray(getApogee(), data);
     
-    if (getApogee()->apogeeData[AVERAGE_ALTITUDE]  <= MainServoEndAlt) {
-        //Stop or disconnect both motors (necessary with continuous servo)
+    if (getAltitudeStruct()->recoveryData[AVERAGE_ALTITUDE]  <= MainServoEndAlt) {
+        
+        //Stop or disconnect both motors here (necessary with continuous servo)
+        
         getParachute()->mainStopped = true;
     }
     
@@ -26,7 +28,7 @@ int chute_state(double data[]) {
     if ((millis() - *getLastLog(COMMON_LASTLOG) >= *getLogInterval(CHUTE_INTERVAL))) {
         setLastLog(millis(), COMMON_LASTLOG);
         // writing recovery values
-        write_SD(RECOVERY_FILE, getApogee()->apogeeData, 6);
+        write_SD(RECOVERY_FILE, getAltitudeStruct()->recoveryData, RECOVERY_DATA_LEN);
     }
     
     if (data[ALTITUDE] <= 5) {
