@@ -9,17 +9,18 @@
 */
 
 #include <Wire.h>
-#include <SD.h>
-#include "src/BME280/SparkFunBME280.h"
-#include "src/Adafruit_BNO055/Adafruit_BNO055.h"
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
+#include "src/SD_interface/SD_interface.h"
+#include "src/servo_interface/servo_interface.h"
+#include "src/sensor_interface/sensor_interface.h"
+#include "src/xbee_transmitter/xbee_tx.h"
+
 #include "src/simulator/serial_reader.h"
- 
+
 /*
     Setup of adresses
  */
-const uint8_t IMU_ADDRESS = 0x28;
 const uint8_t SD_CS_pin = BUILTIN_SDCARD;
 #define LED_pin 13
 
@@ -44,22 +45,23 @@ state current_state = START_STATE;
 return_code state_transition = REPEAT;
 
 /*
-    Initialization of the BME and IMU sensor
+    Initialization of the data file names.
+    IMPORTANT!!!: If the names are too long you will fail to write to the file.......(use short file names)
  */
-BME280 Bme;
-Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
+const String dataFileName = "DataFile.txt";
+const String airbrakesFileName = "AbFile.txt";
+const String recoveryFileName = "RecFile.txt";
 
-/*
-    Initialization of the data file
- */
-File dataFile;
-const String filename = "Datafile.txt";
+/* Moved globals to SD_interface.cpp, remove when reviewed by master branch
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
+*/
 
 //Init data array
 double data[NUM_TYPES];
 
+//Init xbee
+XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
 
 void setup()
 {
@@ -73,7 +75,7 @@ void setup()
   delay(500);
   
   Serial.println("Starting I2C communication with BME280");
-  if (!Bme.beginI2C())
+  if (!get_BME()->beginI2C())
   {
     Serial.println("The BME sensor did not respond. Please check wiring.");
   }
@@ -83,7 +85,7 @@ void setup()
   delay(200);
   
   Serial.println("Setting up the IMU..");
-  if (!IMU.begin())
+  if (!get_IMU()->begin())
   {
     Serial.println("The IMU sensor did not respond. Please check wiring.");
   }
@@ -99,25 +101,69 @@ void setup()
   }
   else {
     delay(1000);
-    Serial.println("SD card module successfully started");
+    if(init_SD(DATA_FILE, dataFileName.c_str()) 
+      && init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str()) 
+      && init_SD(RECOVERY_FILE, recoveryFileName.c_str())) {
+      Serial.println("Successfully opened file(s) on SD card");
+    }
+    else{
+      Serial.println("Successfully opened file on SD card");
+    }
+    
     delay(2000); 
   }
 
+  //Calibrate BME pressure sensor to read 0m altitude at current location
+  calibrateAGL();
+
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
-  
+
   //Delete file?
-  Serial.println("Type 'd'/'k' to delete or keep log file ");
+  Serial.println("Commands: \n 'd': delete data log \n 'a': delete airbrakes log \n 'r': delete recovery log \n 'e': delete every log \n 'k': to continue");
 
   const unsigned long startedWaiting = millis();
-  const unsigned long waitNMillis = 5000;
+  const unsigned long waitNMillis = 10000;
 
   //Option to remove file using serial for waitNMillis milliseconds
   while(millis() - startedWaiting <= waitNMillis){
     String answer;
+    //since serial read only reads one byte at a time we can't use codes longer than one letter
+    //look into using readline in the future.
     answer = Serial.read(); 
     if (answer == "d"){
-      SD.remove(filename.c_str());
+      SD.remove(dataFileName.c_str());
+      delay(10);
+      init_SD(DATA_FILE, dataFileName.c_str());
+      Serial.print("Deleted data file.");
+      break;
+    }
+    else if (answer == "a") {
+      SD.remove(airbrakesFileName.c_str());
+      delay(10);
+      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
+      Serial.print("Deleted airbrakes file.");
+      break;
+    }
+    else if (answer == "r"){
+      SD.remove(recoveryFileName.c_str());
+      delay(10);
+      init_SD(RECOVERY_FILE, recoveryFileName.c_str());
+      Serial.print("Deleted recovery file.");
+      break;
+    }
+    else if (answer == "e") {
+      SD.remove(dataFileName.c_str());
+      delay(10);
+      init_SD(DATA_FILE, dataFileName.c_str());
+      delay(10);
+      SD.remove(airbrakesFileName.c_str());
+      delay(10);
+      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
+      SD.remove(recoveryFileName.c_str());
+      delay(10);
+      init_SD(RECOVERY_FILE, recoveryFileName.c_str());
+      Serial.print("Deleted every file.");
       break;
     }
     else if (answer == "k") {
@@ -130,6 +176,15 @@ void setup()
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, HIGH);
   delay(500);
+
+  //Setup done -> lights diode on teensy
+  pinMode(LED_pin, OUTPUT);
+  digitalWrite(LED_pin, HIGH);
+
+  // init servos
+  init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN);
+  init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN);
+  init_servo(MAIN_SERVO, MAIN_SERVO_PIN);
 }
 
 void loop()
@@ -146,102 +201,30 @@ void loop()
 
   Serial.print("curr_state");
   Serial.println(data[STATE]);
-
+  
   //Running the state machine
   state_function = state_functions[current_state];
   state_transition = return_code(state_function(data));
   current_state = lookup_transition(current_state, state_transition);
   data[STATE] = current_state;
 
-  //Reset IMU when transitioning to ARMED state
   if(state_transition == NEXT && current_state==ARMED){
-    IMU.begin();
+    get_IMU()->begin();
     delay(100);
   }
 
   
-  //Starting writing to SD card when ARMED
-  dataFile = SD.open("Datafile.txt", FILE_WRITE);
-  if (dataFile && (current_state >= IDLE) && millis() - prevLogTime >= logEveryKMsec) {
-    prevLogTime = millis();
-    dataFile.println(createDataString(data));
-  }
-  else {
-    Serial.println("Error opening file");
-  }
-  dataFile.close();
-}
-
-String createDataString(double data[NUM_TYPES]){
-  String dataString = "";
-
-  for (int i = 0; i < NUM_TYPES; i++){
-    dataString += String(data[i]);
-    dataString += ",";
+  //Starting writing to SD card when ARMED 
+  if ((current_state >= ARMED) && (millis() - *getLastLog(DATA_LASTLOG) >= *getLogInterval(DATA_INTERVAL))) {
+      setLastLog(millis(), DATA_LASTLOG);
+      write_SD(DATA_FILE, data, NUM_TYPES);
   }
 
-  return dataString;
-}
-
-/*
-    Note that the IMU has declared x axis as the yaw axis, the y axis as the
-    pitch axis and the z axis as the roll axis. This is corrected as:
-      roll  = x axis
-      pitch = y axis
-      yaw   = z axis
-*/
-void readSensors(){
-  //Update BMP280 sensor data
-  data[BME_TEMP] = Bme.readTempC();
-  data[PRESSURE] = Bme.readFloatPressure();
-  data[ALTITUDE] = Bme.readFloatAltitudeMeters();
-
-  //Temp IMU deg
-  data[IMU_TEMP] = IMU.getTemp();
-
-  //Extract Acceleration in m/s^2
-  imu::Vector<3> accel = IMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-  data[ACC_X] = accel.x();
-  data[ACC_Y] = accel.y();
-  data[ACC_Z] = accel.z();
-  
-  //Extract magnetometer data in uT
-  imu::Vector<3> mag = IMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-  data[MAG_X] = mag.x();
-  data[MAG_Y] = mag.y();
-  data[MAG_Z] = mag.z();
-
-  //Extract euler angles in deg
-  imu::Vector<3> euler = IMU.getVector(Adafruit_BNO055::VECTOR_EULER);
-  data[ROLL] = euler.z();
-  data[PITCH] = euler.y();
-  data[YAW] = euler.x();
-
-  //Extract angular rates in dps
-  imu::Vector<3> rates = IMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  data[ANGULAR_VEL_X] = rates.z();
-  data[ANGULAR_VEL_Y] = rates.y();
-  data[ANGULAR_VEL_Z] = rates.x();
-
-  //Extract gravity components
-  imu::Vector<3> gravity = IMU.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
-  data[GRAVITY_ACC_X] = gravity.x();
-  data[GRAVITY_ACC_Y] = gravity.y();
-  data[GRAVITY_ACC_Z] = gravity.z();
-
-  //linear acceleration = acceleration - gravity
-  imu::Vector<3> linear_accel = IMU.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  data[LINEAR_ACCEL_X] = linear_accel.x();
-  data[LINEAR_ACCEL_Y] = linear_accel.y();
-  data[LINEAR_ACCEL_Z] = linear_accel.z();
-
-  //Extract unit quaternions
-  imu::Quaternion quaternions = IMU.getQuat(); 
-  data[QUATERNION_X] = quaternions.x();
-  data[QUATERNION_Y] = quaternions.y();
-  data[QUATERNION_Z] = quaternions.z();
-  data[QUATERNION_W] = quaternions.w();
-
-  //data[TIMESTAMP]= event.timestamp;
-  data[TIMESTAMP] = millis();
+  Serial.print("Current state: ");
+  Serial.println(data[STATE]);
+  Serial.print("Current gps altitude: ");
+  Serial.println(data[ALTITUDE_GPS]);
+  Serial.print("Current barometer altitude: ");
+  Serial.println(data[ALTITUDE]);
+  xbee.transmit();
 }
