@@ -30,8 +30,6 @@ void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     double sumAlt = 0;
     double min = 999999999;
     double max = -1;
-    //HERE
-    static int counter = 0;
     for (int i = 0; i < ARRAY_LEN; i++) {
         if (altitudes[i] > max) {
             max = altitudes[i];
@@ -56,8 +54,6 @@ void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     if (apogeeDataArray[AVERAGE_ALTITUDE] > apogeeDataArray[MAX_ALTITUDE]) {
         apogeeDataArray[MAX_ALTITUDE] = apogeeDataArray[AVERAGE_ALTITUDE];
     }
-        //HERE
-    apogeeDataArray[TIMESTAMP_APOGEE] = counter++;
 }
 
 void ApogeeArray::updateApogeeArray(ApogeeArray* alt, double currentAlt) {
