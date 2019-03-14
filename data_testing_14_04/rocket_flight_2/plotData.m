@@ -74,9 +74,9 @@ subplot(5,1,4);
 plot(timestamp/1000, states);
 xlabel('seconds [s]');
 ylabel('state');
-xlim([-1,20]);
+xlim([0,20]);
 legend('states');
-title('Altitude');
+title('State transitions');
 
 
 %plot temperature
