@@ -35,7 +35,7 @@ int airbrakes_state(double data[]) {
 	dt /= (float)1000; // converted to seconds
 	time_old = data[TIMESTAMP];
 
-	kalman(estimates, data[ALTITUDE], data[ACC_Z], dt, reference_v);
+	kalman(estimates, data[ALTITUDE], data[ACC_Y]*-1, dt, reference_v);
 	
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = reference_v - estimates[1];

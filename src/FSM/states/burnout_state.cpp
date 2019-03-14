@@ -18,11 +18,11 @@ int burnout_state(double data[]) {
 	burntime = data[TIMESTAMP] - launchTime;
 
 	//if acc_z is negative but increasing
-	if(data[ACC_Z] > last_acc_z && last_acc_z < 0){
+	if(data[ACC_Y]*-1 > last_acc_z && last_acc_z < 0){
 		// increment the increasing count
 		increasing_count += 1;
 	}
-	last_acc_z = data[ACC_Z];
+	last_acc_z = data[ACC_Y]*-1;
 
 	// if data[ACC_Z] is negative but increasing, and time is more than burntime - epsilon
 	// or time is more than burntime + epsilon which is the uppper limit.
