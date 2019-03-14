@@ -23,7 +23,7 @@ int armed_state(double data[]) {
 	Serial.println("Waiting for z-accel input: must be larger than 12");
 
 
-	if (data[ACC_Z] > 15.0) {
+	if (data[LINEAR_ACCEL_X] > 15.0) {
 		ret_code = NEXT;
 	}
 	else {
