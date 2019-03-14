@@ -32,44 +32,62 @@ IMU_quaternion_x = data(:,24);
 IMU_quaternion_y = data(:,25);
 IMU_quaternion_z = data(:,26);
 IMU_quaternion_w = data(:,27);
+states = data(:,28);
 
 figure(1);
 %plot Acceleration
-subplot(4,1,1);
+subplot(5,1,1);
 plot(timestamp/1000, IMU_lin_accel_x,'r');
 hold on;
 plot(timestamp/1000, IMU_lin_accel_y,'g');
 plot(timestamp/1000, IMU_lin_accel_z,'b');
 xlabel('seconds [s]');
 ylabel('acceleration [m/s^2]');
-legend('Acc_x','Acc_y','Acc_z');
+legend('Lin\_Accel_x','Lin\_Accel_y','Lin\_Accel_z');
+xlim([430,550]);
 title('Accelerations');
 
 %plot ROLL/PITCH/YAW
-subplot(4,1,2);
+subplot(5,1,2);
 plot(timestamp/1000, IMU_roll,'r');
 hold on;
 plot(timestamp/1000, IMU_pitch,'g');
 plot(timestamp/1000, IMU_yaw,'b');
 xlabel('seconds [s]');
 ylabel('degrees [°]');
-legend('Roll','Pitch','Yaw');
+xlim([430,550]);
+legend('Roll_z','Pitch_y','Yaw_x');
+
 title('Euler angles in body frame');
 
 %plot altitude
-subplot(4,1,3);
+subplot(5,1,3);
 plot(timestamp/1000, BME_altitude);
 xlabel('seconds [s]');
 ylabel('height [m]');
+xlim([430,550]);
 legend('Altitude');
 title('Altitude');
 
+%plot states
+subplot(5,1,4);
+plot(timestamp/1000, states);
+xlabel('seconds [s]');
+ylabel('state');
+xlim([430,550]);
+legend('states');
+title('Altitude');
+
+
 %plot temperature
-subplot(4,1,4);
+subplot(5,1,5);
 plot(timestamp/1000, BME_temp);
 hold on;
 plot(timestamp/1000, IMU_temp);
 xlabel('seconds [s]');
 ylabel('deg celsius [°/C]');
 legend('BME Temperature','IMU Temperature');
+xlim([430,550]);
 title('Temperature');
+
+%Plot states
