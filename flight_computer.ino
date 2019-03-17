@@ -1,4 +1,3 @@
-
 /*
   This arduino program is currently doing the following:
     1. Initializing sensor objects and log file.
