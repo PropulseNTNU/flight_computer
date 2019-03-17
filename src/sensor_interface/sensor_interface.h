@@ -6,6 +6,11 @@
 #include "BME280/SparkFunBME280.h"
 #include "GPS/gps.h"
 
+/*
+	REMEMBER TO CHANGE THIS TO FALSE WHEN NOT USING THE TEST ROCKET
+*/
+const bool USING_TEST_ROCKET = true;
+
 
 const uint8_t IMU_ADDRESS = 0x28;
 

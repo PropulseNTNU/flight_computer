@@ -50,10 +50,9 @@ const String dataFileName = "DataFile.txt";
 const String airbrakesFileName = "AbFile.txt";
 const String recoveryFileName = "RecFile.txt";
 
-/* Moved globals to SD_interface.cpp, remove when reviewed by master branch
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
-*/
+
 
 //Init data array
 double data[NUM_TYPES];
@@ -197,8 +196,8 @@ void loop()
   }
   
   //Starting writing to SD card when ARMED 
-  if ((current_state >= ARMED) && (millis() - *getLastLog(DATA_LASTLOG) >= *getLogInterval(DATA_INTERVAL))) {
-      setLastLog(millis(), DATA_LASTLOG);
+  if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
+      prevLogTime = millis();
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
 

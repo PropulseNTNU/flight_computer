@@ -4,6 +4,7 @@
     Initialization of the BME and IMU sensor
     BME sensor initial address 0x77, if jumper is added address is 0x76
  */
+
 BME280 Bme;
 Adafruit_BNO055 IMU = Adafruit_BNO055(100, IMU_ADDRESS);
 
@@ -97,6 +98,18 @@ void readSensors(double *data){
   
   //data[TIMESTAMP]= event.timestamp;
   data[TIMESTAMP] = millis();
+
+  /*On the test rocket the y axis is pointing to the fins. Thus, we need to
+    multiply the y defined sensor data with -1.
+  */
+  if(USING_TEST_ROCKET){
+    data[ACC_Y] = data[ACC_Y]*-1;
+    data[MAG_Y] = data[MAG_Y]*-1;
+    data[PITCH] = data[PITCH]*-1;
+    data[ANGULAR_VEL_Y] = data[ANGULAR_VEL_Y]*-1;
+    data[GRAVITY_ACC_Y] = data[GRAVITY_ACC_Y]*-1;
+    data[LINEAR_ACCEL_Y] = data[LINEAR_ACCEL_Y]*-1;
+  }
 }
 
 /* This function is called every time new GPS-data is 
