@@ -75,7 +75,8 @@ plot(timestamp/1000, states);
 xlabel('seconds [s]');
 ylabel('state');
 xlim([0,20]);
-legend('states');
+l = legend('states [1=armed,2=burnout,3=airbrakes,4=apogee,5=drogue,6=chute,7=landed]');
+l.FontSize = 16;
 title('State transitions');
 
 
