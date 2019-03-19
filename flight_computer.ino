@@ -15,6 +15,9 @@
 #include "src/servo_interface/servo_interface.h"
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
+#include "src/bluetooth/bluetooth.h"
+
+
 
 /*
     Setup of adresses
@@ -57,9 +60,14 @@ unsigned long prevLogTime;
 //Init data array
 double data[NUM_TYPES];
 
+//Init bluetooth data array
+const int NUM_SENSORS = NUMBER_OF_SENSORS - 1;
+double payloadData[NUM_SENSORS]; 
+
 
 //Init xbee
-XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]), nullptr, 0);
+XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]), (void*) payloadData, NUM_SENSORS * sizeof(data[0]));
+
 
 void setup()
 {
@@ -113,6 +121,17 @@ void setup()
 
   //Calibrate BME pressure sensor to read 0m altitude at current location
   calibrateAGL();
+
+
+  //
+  Serial.println("Setup for recieving bluetooth communication");
+  if (setupBle(payloadData, NUM_SENSORS))
+  {
+    Serial.println("Bluetooth setup done");
+  }
+  else {
+    Serial.println("Bluetooth crashed");
+  } 
 
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
@@ -183,6 +202,16 @@ void setup()
 void loop()
 { 
   readSensors(data);
+  
+  //bluetooth
+  updateDataFromBle(payloadData);
+  //for testing bluetooth data
+  Serial.println("Data recieved:");
+  for(int i= 0; i < 13; i++){
+    Serial.println(payloadData[i]);
+  }
+  //test end
+  
   
   //Running the state machine
   state_function = state_funcs[current_state];
