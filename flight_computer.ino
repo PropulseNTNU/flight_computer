@@ -57,8 +57,9 @@ unsigned long prevLogTime;
 //Init data array
 double data[NUM_TYPES];
 
+
 //Init xbee
-XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
+XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]), nullptr, 0);
 
 void setup()
 {
