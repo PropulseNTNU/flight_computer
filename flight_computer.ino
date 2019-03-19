@@ -15,7 +15,7 @@
 #include "src/servo_interface/servo_interface.h"
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
-#include "src/receiverPI/bluetooth.h"
+#include "src/bluetooth/bluetooth.h"
 
 
 
