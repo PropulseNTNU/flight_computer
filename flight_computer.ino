@@ -26,7 +26,7 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
     Specify the start and end state here, modify the START_STATE
     to the state function you would like to test.
 */
-#define START_STATE IDLE
+#define START_STATE AIRBRAKES
 #define END_STATE LANDED
 
 /*
@@ -46,9 +46,9 @@ return_code ret_code = REPEAT;
     Initialization of the data file names.
     IMPORTANT!!!: If the names are too long you will fail to write to the file.......(use short file names)
  */
-const String dataFileName = "DataFile.txt";
-const String airbrakesFileName = "AbFile.txt";
-const String recoveryFileName = "RecFile.txt";
+String dataFileName = "Data.txt";
+String airbrakesFileName = "Ab.txt";
+String recoveryFileName = "Rec.txt";
 
 /* Moved globals to SD_interface.cpp, remove when reviewed by master branch
 unsigned long logEveryKMsec = 10;
@@ -94,81 +94,37 @@ void setup()
   
   //Setup SD-card module
   if (!SD.begin(SD_CS_pin)) {
-    Serial.println("initialization failed!");
+    Serial.println("SD initialization failed!");
     delay(1000);
   }
   else {
-    delay(1000);
-    if(init_SD(DATA_FILE, dataFileName.c_str()) 
-      && init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str()) 
-      && init_SD(RECOVERY_FILE, recoveryFileName.c_str())) {
-      Serial.println("Successfully opened file(s) on SD card");
-    }
-    else{
-      Serial.println("Successfully opened file on SD card");
-    }
-    
-    delay(2000); 
+      uint8_t fileNumber = 0;
+      while (SD.exists(recoveryFileName.c_str()) &&
+             SD.exists(airbrakesFileName.c_str()) &&
+             SD.exists(dataFileName.c_str())){
+            dataFileName = "Data"+ String(fileNumber) + ".txt";
+            recoveryFileName = "Rec"+ String(fileNumber) + ".txt";
+            airbrakesFileName = "Ab"+ String(fileNumber) + ".txt";
+            fileNumber += 1;
+      }
+      
+      if(init_SD(DATA_FILE, dataFileName.c_str()) &&
+         init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str()) && 
+         init_SD(RECOVERY_FILE, recoveryFileName.c_str())) 
+        {
+          Serial.println("Successfully opened file(s) on SD card");
+        }
+      else{
+          Serial.println("Failed to opened file(s) on SD card");
+      }
   }
+  delay(1000);
 
   //Calibrate BME pressure sensor to read 0m altitude at current location
   calibrateAGL();
 
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
-
-  //Delete file?
-  Serial.println("Commands: \n 'd': delete data log \n 'a': delete airbrakes log \n 'r': delete recovery log \n 'e': delete every log \n 'k': to continue");
-
-  const unsigned long startedWaiting = millis();
-  const unsigned long waitNMillis = 10000;
-
-  //Option to remove file using serial for waitNMillis milliseconds
-  while(millis() - startedWaiting <= waitNMillis){
-    String answer;
-    //since serial read only reads one byte at a time we can't use codes longer than one letter
-    //look into using readline in the future.
-    answer = Serial.read(); 
-    if (answer == "d"){
-      SD.remove(dataFileName.c_str());
-      delay(10);
-      init_SD(DATA_FILE, dataFileName.c_str());
-      Serial.print("Deleted data file.");
-      break;
-    }
-    else if (answer == "a") {
-      SD.remove(airbrakesFileName.c_str());
-      delay(10);
-      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
-      Serial.print("Deleted airbrakes file.");
-      break;
-    }
-    else if (answer == "r"){
-      SD.remove(recoveryFileName.c_str());
-      delay(10);
-      init_SD(RECOVERY_FILE, recoveryFileName.c_str());
-      Serial.print("Deleted recovery file.");
-      break;
-    }
-    else if (answer == "e") {
-      SD.remove(dataFileName.c_str());
-      delay(10);
-      init_SD(DATA_FILE, dataFileName.c_str());
-      delay(10);
-      SD.remove(airbrakesFileName.c_str());
-      delay(10);
-      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
-      SD.remove(recoveryFileName.c_str());
-      delay(10);
-      init_SD(RECOVERY_FILE, recoveryFileName.c_str());
-      Serial.print("Deleted every file.");
-      break;
-    }
-    else if (answer == "k") {
-      break;
-    }
-  }
-  Serial.println("Continuing..");
 
   //Setup done -> lights diode on teensy
   pinMode(LED_pin, OUTPUT);
@@ -182,7 +138,8 @@ void setup()
 
 void loop()
 { 
-  readSensors(data);
+  //readSensors(data);
+  data[TIMESTAMP] = millis();
   
   //Running the state machine
   state_function = state_funcs[current_state];
@@ -199,7 +156,9 @@ void loop()
   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - *getLastLog(DATA_LASTLOG) >= *getLogInterval(DATA_INTERVAL))) {
       setLastLog(millis(), DATA_LASTLOG);
-      write_SD(DATA_FILE, data, NUM_TYPES);
+      double dummyData[31] = {data[TIMESTAMP], 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3};
+      write_SD(DATA_FILE, dummyData, 31);
+      //write_SD(DATA_FILE, data, NUM_TYPES);
   }
 
   Serial.print("Current state: ");
@@ -208,5 +167,5 @@ void loop()
   Serial.println(data[ALTITUDE_GPS]);
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
-  xbee.transmit();
+  //xbee.transmit();
 }

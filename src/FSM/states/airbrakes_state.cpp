@@ -52,16 +52,16 @@ int airbrakes_state(double data[]) {
 	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
 		setLastLog(millis(), COMMON_LASTLOG);
 		// these values may be nan during testing since the lookup table or sensors may be missing
-		double values[3] = {(double)estimates[0], (double)estimates[1], (double)u};
-		write_SD(AIRBRAKES_FILE, values, 3);
-        
+		double values[4] = {data[TIMESTAMP], 4, 5, 6};
+		write_SD(AIRBRAKES_FILE, values,4);
+        double values2[4] = {data[TIMESTAMP], 7, 8, 9};
         // writing recovery values
-        write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
+        write_SD(RECOVERY_FILE, values2, 4);
 	}
 
     // remmember to update this to correct tests
 	if (apogeeDetected(getApogee(), data)) {
-		ret_code = NEXT;
+		ret_code = REPEAT;
 	}
 	else {
 		ret_code = REPEAT;
