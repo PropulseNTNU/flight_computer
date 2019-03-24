@@ -55,10 +55,9 @@ hold on;
 plot(timestamp/1000, IMU_acc_y,'g');
 plot(timestamp/1000, IMU_acc_z,'b');
 xlabel('seconds [s]');
-ylabel('Accel [°]');
+ylabel('acceleration [m/s^2]');
 xlim([startInterval,endInterval]);
 legend('Acceleration_z','Acceleration_y','Acceleration_x');
-
 title('Acceleration');
 
 %plot Acceleration
@@ -66,17 +65,15 @@ subplot(5,1,3);
 totalAcc = sqrt(IMU_acc_x.^2 + IMU_acc_x.^2 + IMU_acc_x.^2)
 plot(timestamp/1000, IMU_acc_x,'r');
 xlabel('seconds [s]');
-ylabel('Accel [°]');
+ylabel('acceleration [m/s^2]');
 xlim([startInterval,endInterval]);
 legend('Total acceleration')
-
-title('Acceleration');
+title('Total Acceleration');
 
 %plot altitude
 subplot(5,1,4);
 plot(timestamp/1000, BME_altitude);
 xlabel('seconds [s]');
-ylabel('height [m]');
 xlim([startInterval,endInterval]);
 legend('Altitude');
 title('Altitude');
@@ -88,6 +85,6 @@ xlabel('seconds [s]');
 ylabel('state');
 xlim([startInterval,endInterval]);
 legend('states');
+l = legend('states [1=armed,2=burnout,3=airbrakes,4=apogee,5=drogue,6=chute,7=landed]');
+l.FontSize = 16;
 title('Altitude');
-
-
