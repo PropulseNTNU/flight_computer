@@ -1,8 +1,9 @@
 filename = 'DATAFILE.TXT';
 delimiterIn = ',';
 headerlinesIn = 0;
-data = importdata(filename,delimiterIn,headerlinesIn);
-
+data = importdata(filename,delimiterIn,headerlinesIn)
+startInterval = 430;
+endInterval = 445;
 %%TODO: IMU_temp = IMU_YAW
 
 timestamp = data(:,1)-data(1,1);
@@ -44,50 +45,49 @@ plot(timestamp/1000, IMU_lin_accel_z,'b');
 xlabel('seconds [s]');
 ylabel('acceleration [m/s^2]');
 legend('Lin\_Accel_x','Lin\_Accel_y','Lin\_Accel_z');
-xlim([430,550]);
-title('Accelerations');
+xlim([startInterval,endInterval]);
+title('Linear acceleration');
 
-%plot ROLL/PITCH/YAW
+%plot Acceleration
 subplot(5,1,2);
-plot(timestamp/1000, IMU_roll,'r');
+plot(timestamp/1000, IMU_acc_x,'r');
 hold on;
-plot(timestamp/1000, IMU_pitch,'g');
-plot(timestamp/1000, IMU_yaw,'b');
+plot(timestamp/1000, IMU_acc_y,'g');
+plot(timestamp/1000, IMU_acc_z,'b');
 xlabel('seconds [s]');
-ylabel('degrees [°]');
-xlim([430,550]);
-legend('Roll_z','Pitch_y','Yaw_x');
+ylabel('Accel [°]');
+xlim([startInterval,endInterval]);
+legend('Acceleration_z','Acceleration_y','Acceleration_x');
 
-title('Euler angles in body frame');
+title('Acceleration');
+
+%plot Acceleration
+subplot(5,1,3);
+totalAcc = sqrt(IMU_acc_x.^2 + IMU_acc_x.^2 + IMU_acc_x.^2)
+plot(timestamp/1000, IMU_acc_x,'r');
+xlabel('seconds [s]');
+ylabel('Accel [°]');
+xlim([startInterval,endInterval]);
+legend('Total acceleration')
+
+title('Acceleration');
 
 %plot altitude
-subplot(5,1,3);
+subplot(5,1,4);
 plot(timestamp/1000, BME_altitude);
 xlabel('seconds [s]');
 ylabel('height [m]');
-xlim([430,550]);
+xlim([startInterval,endInterval]);
 legend('Altitude');
 title('Altitude');
 
 %plot states
-subplot(5,1,4);
+subplot(5,1,5);
 plot(timestamp/1000, states);
 xlabel('seconds [s]');
 ylabel('state');
-xlim([430,550]);
+xlim([startInterval,endInterval]);
 legend('states');
 title('Altitude');
 
 
-%plot temperature
-subplot(5,1,5);
-plot(timestamp/1000, BME_temp);
-hold on;
-plot(timestamp/1000, IMU_temp);
-xlabel('seconds [s]');
-ylabel('deg celsius [°/C]');
-legend('BME Temperature','IMU Temperature');
-xlim([430,550]);
-title('Temperature');
-
-%Plot states

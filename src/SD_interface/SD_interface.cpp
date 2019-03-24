@@ -2,7 +2,7 @@
 
 File files[NUM_FILES];
 
-unsigned long logIntervals[NUM_INTERVALS] = {10, 10, 100, 1000};
+unsigned long logIntervals[NUM_INTERVALS] = {10, 10, 100, 100};
 unsigned long lastLog[NUM_LASTLOGS];
 
 String createDataString(double* data, int len){

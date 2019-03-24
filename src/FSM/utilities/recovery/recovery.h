@@ -13,14 +13,13 @@
 struct ParachuteStateStruct {
     bool drogueDeployed = false; //type uint8_t = 1 byte
     bool mainDeployed = false;
-    bool mainStopped = false;
-   // (Constructor Option) ParachuteStateStruct() : drogueDeployed(false), mainDeployed(false), mainStopped(false) {}
+   // (Constructor Option) ParachuteStateStruct() : drogueDeployed(false), mainDeployed(false) {}
 };
 
 typedef struct ParachuteStateStruct Parachute;
 
 /* Alternative to struct -> array
- enum deployed_parachutes {DROGUE, MAIN_DEPLOY, MAIN_STOP, NUM_TYPES};
+ enum deployed_parachutes {DROGUE, MAIN_DEPLOY, NUM_TYPES};
  bool parachute_state[NUM_TYPES]; //to access bool variables, then instead of struct pointer we can use array pointer.
  */
 

@@ -13,11 +13,9 @@
 int apogee_state(double data[]) {
     return_code ret_code;
     
-    if (!getParachute()->drogueDeployed) {
-        deployDrogueChute(data[TIMESTAMP]);
-        getParachute()->drogueDeployed = true;
-    }
-    
+    deployDrogueChute(data[TIMESTAMP]);
+    getParachute()->drogueDeployed = true;
+
     write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
     
     if (getParachute()->drogueDeployed) {
@@ -28,4 +26,3 @@ int apogee_state(double data[]) {
     
     return ret_code;
 }
-

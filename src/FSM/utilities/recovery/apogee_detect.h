@@ -3,28 +3,33 @@
 #include "../../states.h"
 #include <math.h>
 
-#define ARRAY_LEN 10
+#define ARRAY_LEN 5
 #define APOGEE_ACC_VAL 1.5  //Lowest value from simulations at ~0.8
 #define TIMER_LENGTH 3000
 #define APOGEE_ALTITUDE_MARGIN 5
-#define RECOVERY_DATA_LEN 10
+#define RECOVERY_DATA_LEN 9
 
+//Remember to change RECOVERY_DATA_LEN
 enum apogeeEnum {
-    RANGE, MAX_ALTITUDE, AVERAGE_DIFF, AVERAGE_ALTITUDE, TOTAL_LIN_ACC, TOTAL_LIN_ACC_APOGEE, TIMESTAMP_BEGIN_TIMER, TIMESTAMP_APOGEE, TIMESTAMP_DROGUE, TIMESTAMP_MAIN, NUM_DATA
+	MAX_ALTITUDE, AVERAGE_DIFF, AVERAGE_ALTITUDE, TOTAL_ACC, TOTAL_ACC_APOGEE, TIMESTAMP_BEGIN_TIMER, TIMESTAMP_APOGEE, TIMESTAMP_DROGUE, TIMESTAMP_MAIN, NUM_REC_DATA
 };
+
+
 
 struct ApogeeArray {
     double altitudes[ARRAY_LEN] = {0};
-    double recoveryData[NUM_DATA] = {0};
+    double recoveryData[NUM_REC_DATA] = {0};
     bool timerEnabled = false;
     void updateDataArray(ApogeeArray* alt, double* data);
 };
 typedef ApogeeArray AltitudeStruct;
 
 
-
-//Returns the magnitude of measured acceleration in x,y,z, while factoring out gravitational acceleration.
+//Returns the magnitude of measured acceleration in x,y,z, while setting a gravitational offset acceleration.
 double totalLinAcceleration(double data[]);     //Important: Check if IMU returns the expected values during test flight.
+
+//Returns the magnitude of measured (proper) acceleration in x,y,z.
+double totalAcceleration(double data[]); 
 
 //Pushes input into altitudes[10] array and removes the last. (FIFO)
 void updateArray(double* array_first, double input);
@@ -44,6 +49,8 @@ void printApogeeArray(ApogeeArray alt);
  
  Redundancy: A timer is started when low acceleration is detected, where apogee is detected after 3 seconds. If we detect very low acc, (~1)/2, then apogee is detected after 1 second.
 */
+bool apogeeDetected(ApogeeArray* apogee, double* data, int enable_acc);
+
 bool apogeeDetected(ApogeeArray* apogee, double* data);
 
 
