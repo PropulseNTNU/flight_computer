@@ -62,8 +62,8 @@ title('Acceleration');
 
 %plot Acceleration
 subplot(5,1,3);
-totalAcc = sqrt(IMU_acc_x.^2 + IMU_acc_x.^2 + IMU_acc_x.^2)
-plot(timestamp/1000, IMU_acc_x,'r');
+totalAcc = sqrt(IMU_acc_x.^2 + IMU_acc_y.^2 + IMU_acc_z.^2)
+plot(timestamp/1000, totalAcc,'r');
 xlabel('seconds [s]');
 ylabel('acceleration [m/s^2]');
 xlim([startInterval,endInterval]);

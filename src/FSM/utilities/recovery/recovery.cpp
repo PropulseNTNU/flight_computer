@@ -38,3 +38,12 @@ void deployMainChute(double timestamp) {
     }
     getAltitudeStruct()->recoveryData[TIMESTAMP_MAIN] = timestamp;
 }
+
+//Resets servo positions for testing.
+void resetDrogueChute() {
+    get_servo(DROGUE_SERVO)->write(165);
+}
+
+void resetMainChute(){
+    get_servo(MAIN_SERVO)->write(165);
+}

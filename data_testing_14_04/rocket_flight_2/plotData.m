@@ -3,8 +3,8 @@ delimiterIn = ',';
 headerlinesIn = 0;
 data = importdata(filename,delimiterIn,headerlinesIn);
 
-startInterval = 1440;
-endInterval = 1500;
+startInterval = 1447;
+endInterval = 1451;
 
 %%TODO: IMU_temp = IMU_YAW
 

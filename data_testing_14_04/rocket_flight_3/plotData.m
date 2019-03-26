@@ -5,8 +5,8 @@ headerlinesIn = 0;
 data = importdata(filename,delimiterIn,headerlinesIn);
 recData = importdata(recFilename,delimiterIn,headerlinesIn);
 
-startInterval = 780;
-endInterval = 820;
+startInterval = 796;
+endInterval = 802;
 
 %%TODO: IMU_temp = IMU_YAW
 
@@ -71,7 +71,7 @@ title('Total magnetic field strength');
 
 
 %plot Acceleration
-subplot(5,1,1);
+subplot(5,1,2);
 
 plot(timestamp/1000, IMU_acc_x,'r');
 hold on;
@@ -85,9 +85,9 @@ xlim([startInterval,endInterval]);
 title('Accelerations with gravity');
 
 %plot total Acceleration
-subplot(5,1,2);
-IMU_total_lin_accel = sqrt(IMU_acc_x.^2 + IMU_acc_y.^2 +IMU_acc_z.^2);
-plot(timestamp/1000, IMU_total_lin_accel,'r');
+subplot(5,1,3);
+IMU_total_accel = sqrt(IMU_acc_x.^2 + IMU_acc_y.^2 +IMU_acc_z.^2);
+plot(timestamp/1000, IMU_total_accel,'r');
 hold on;
 grid on;
 xlabel('seconds [s]');
@@ -98,7 +98,7 @@ title('Total accelerations with gravity');
 
 
 %plot total Acceleration
-subplot(5,1,3);
+subplot(5,1,1);
 IMU_total_lin_accel = sqrt(IMU_lin_accel_x.^2 + IMU_lin_accel_y.^2 +IMU_lin_accel_z.^2);
 plot(timestamp/1000, IMU_total_lin_accel,'r');
 hold on;

@@ -14,7 +14,7 @@ int drogue_state(double data[]) {
     return_code ret_code;
     
     //This updates the altitude array with current altitude, done here to access altitude table.
-    getAltitudeStruct()->updateDataArray(getAltitudeStruct(), data);
+    getAltitudeStruct()->updateDataArray(getAltitudeStruct(), data[ALTITUDE]);
     
     //Criteria directly based on average altitude (last 10 measurements) being less than 457m.
     if ((!getParachute()->mainDeployed) && (getAltitudeStruct()->recoveryData[AVERAGE_ALTITUDE] <= MainChuteALT)) {

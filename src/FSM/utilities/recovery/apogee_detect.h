@@ -7,11 +7,17 @@
 #define APOGEE_ACC_VAL 1.5  //Lowest value from simulations at ~0.8
 #define TIMER_LENGTH 3000
 #define APOGEE_ALTITUDE_MARGIN 5
-#define RECOVERY_DATA_LEN 9
+#define RECOVERY_DATA_LEN 6
 
 //Remember to change RECOVERY_DATA_LEN
+/*
 enum apogeeEnum {
-	MAX_ALTITUDE, AVERAGE_DIFF, AVERAGE_ALTITUDE, TOTAL_ACC, TOTAL_ACC_APOGEE, TIMESTAMP_BEGIN_TIMER, TIMESTAMP_APOGEE, TIMESTAMP_DROGUE, TIMESTAMP_MAIN, NUM_REC_DATA
+	MAX_ALTITUDE, AVERAGE_ALTITUDE, TOTAL_ACC, TOTAL_ACC_APOGEE, TIMESTAMP_BEGIN_TIMER, TIMESTAMP_APOGEE, TIMESTAMP_DROGUE, TIMESTAMP_MAIN, NUM_REC_DATA
+};
+*/
+
+enum apogeeEnum {
+	MAX_ALTITUDE, AVERAGE_ALTITUDE, TIMESTAMP_BEGIN_TIMER, TIMESTAMP_APOGEE, TIMESTAMP_DROGUE, TIMESTAMP_MAIN, NUM_REC_DATA
 };
 
 
@@ -20,13 +26,9 @@ struct ApogeeArray {
     double altitudes[ARRAY_LEN] = {0};
     double recoveryData[NUM_REC_DATA] = {0};
     bool timerEnabled = false;
-    void updateDataArray(ApogeeArray* alt, double* data);
+    void updateDataArray(ApogeeArray* alt, double input_altitude);
 };
 typedef ApogeeArray AltitudeStruct;
-
-
-//Returns the magnitude of measured acceleration in x,y,z, while setting a gravitational offset acceleration.
-double totalLinAcceleration(double data[]);     //Important: Check if IMU returns the expected values during test flight.
 
 //Returns the magnitude of measured (proper) acceleration in x,y,z.
 double totalAcceleration(double data[]); 
