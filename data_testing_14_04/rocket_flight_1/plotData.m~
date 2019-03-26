@@ -69,10 +69,11 @@ end
 filename2 = 'Eggtimer.txt';
 delimiterIn2 = ',';
 headerlinesIn2 = 0;
-data2 = importdata(filename2,delimiterIn2,headerlinesIn2);
-time_egg= data2(:,1);
-h_egg= data2(:, 2);
-v_egg= data2(:, 3);
+data2 = importdata(filename,delimiterIn,headerlinesIn);
+time_egg= data(:,1);
+h_egg= data(:, 2);
+v_egg= data
+
 
 
 
@@ -124,15 +125,7 @@ figure(4);
 plot(time_est(1:136), est_v, 'LineWidth', 2);
 hold on;
 plot(time_est(1:136), est_v2, 'LineWidth', 1.5);
-ylim([-10,100]); 
-
-% figure(6);
-% plot(time_egg, h_egg);
-% 
-% figure(7);
-% plot(time_egg, v_egg);
-% ylim([-10,363]);
-% xlim([0,12]);
+ylim([-10,100]);
 %plot states
 % subplot(5,1,4);
 % plot(timestamp/1000, states);
