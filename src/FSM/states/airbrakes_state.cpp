@@ -47,8 +47,8 @@ int airbrakes_state(double data[]) {
 	}
 
     //This updates the ApogeeArray with current altitude
-    getAltitudeStruct()->updateDataArray(getAltitudeStruct(), data[ALTITUDE]);
-    //getAltitudeStruct()->updateDataArray(getAltitudeStruct(), (double)estimates[0]); //kalman_altitude == estimates[0]
+    //getAltitudeStruct()->updateDataArray(getAltitudeStruct(), data[ALTITUDE]);
+    getAltitudeStruct()->updateDataArray(getAltitudeStruct(), (double)estimates[0]); //kalman_altitude == estimates[0]
 	
 	// write values from both airbrakes and recovery to SD card
 	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
