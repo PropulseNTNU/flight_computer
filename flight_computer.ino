@@ -95,7 +95,6 @@ void setup()
   //Setup SD-card module
   if (!SD.begin(SD_CS_pin)) {
     Serial.println("SD initialization failed!");
-    delay(1000);
   }
   else {
       uint8_t fileNumber = 0;
@@ -156,9 +155,7 @@ void loop()
   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - *getLastLog(DATA_LASTLOG) >= *getLogInterval(DATA_INTERVAL))) {
       setLastLog(millis(), DATA_LASTLOG);
-      double dummyData[31] = {data[TIMESTAMP], 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3};
-      write_SD(DATA_FILE, dummyData, 31);
-      //write_SD(DATA_FILE, data, NUM_TYPES);
+      write_SD(DATA_FILE, data, NUM_TYPES);
   }
 
   Serial.print("Current state: ");

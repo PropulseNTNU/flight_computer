@@ -39,6 +39,7 @@ int airbrakes_state(double data[]) {
 	
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = reference_v - estimates[1];
+
 	u += controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
 
 	// write error and controll signal too file before if statement
@@ -52,11 +53,10 @@ int airbrakes_state(double data[]) {
 	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
 		setLastLog(millis(), COMMON_LASTLOG);
 		// these values may be nan during testing since the lookup table or sensors may be missing
-		double values[4] = {data[TIMESTAMP], 4, 5, 6};
-		write_SD(AIRBRAKES_FILE, values,4);
-        double values2[4] = {data[TIMESTAMP], 7, 8, 9};
+		double abValues[3] = {data[TIMESTAMP], estimates[0], estimates[1]};
+		write_SD(AIRBRAKES_FILE, abValues, 3);
         // writing recovery values
-        write_SD(RECOVERY_FILE, values2, 4);
+		write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
 	}
 
     // remmember to update this to correct tests
