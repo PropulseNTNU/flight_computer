@@ -50,10 +50,9 @@ String dataFileName = "Data.txt";
 String airbrakesFileName = "Ab.txt";
 String recoveryFileName = "Rec.txt";
 
-/* Moved globals to SD_interface.cpp, remove when reviewed by master branch
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
-*/
+
 
 //Init data array
 double data[NUM_TYPES];
@@ -153,16 +152,17 @@ void loop()
   }
   
   //Starting writing to SD card when ARMED 
-  if ((current_state >= ARMED) && (millis() - *getLastLog(DATA_LASTLOG) >= *getLogInterval(DATA_INTERVAL))) {
-      setLastLog(millis(), DATA_LASTLOG);
+  if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
+      prevLogTime = millis();
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
 
-  Serial.print("Current state: ");
+  /*Serial.print("Current state: ");
   Serial.println(data[STATE]);
   Serial.print("Current gps altitude: ");
   Serial.println(data[ALTITUDE_GPS]);
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
-  //xbee.transmit();
+  */
+  xbee.transmit();
 }

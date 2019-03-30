@@ -6,7 +6,7 @@ XBee::XBee(void* sensors, const uint8_t num_sens_bytes)
         : num_sens_bytes(num_sens_bytes), timer(millis()), package_number(0), sensors((uint8_t*)sensors) {
          
           //Activating serial communication
-          Serial5.begin(9600);
+          Serial5.begin(UART_BAUDRATE);
           Serial5.setTimeout(25);
 
           //Resetting module

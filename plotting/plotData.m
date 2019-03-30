@@ -32,44 +32,70 @@ IMU_quaternion_x = data(:,24);
 IMU_quaternion_y = data(:,25);
 IMU_quaternion_z = data(:,26);
 IMU_quaternion_w = data(:,27);
+states = data(:,28);
 
 figure(1);
 %plot Acceleration
-subplot(4,1,1);
+subplot(5,1,1);
+
 plot(timestamp/1000, IMU_lin_accel_x,'r');
 hold on;
-plot(timestamp/1000, IMU_lin_accel_y,'g');
+plot(timestamp/1000, -1*IMU_lin_accel_y,'g');
 plot(timestamp/1000, IMU_lin_accel_z,'b');
+grid on;
 xlabel('seconds [s]');
 ylabel('acceleration [m/s^2]');
-legend('Acc_x','Acc_y','Acc_z');
-title('Accelerations');
+l = legend('Lin\_Accel_x','Lin\_Accel_y','Lin\_Accel_z');
+%xlim([786,850]);
+title('Accelerations without gravity');
 
 %plot ROLL/PITCH/YAW
-subplot(4,1,2);
+subplot(5,1,2);
 plot(timestamp/1000, IMU_roll,'r');
 hold on;
+grid on;
 plot(timestamp/1000, IMU_pitch,'g');
 plot(timestamp/1000, IMU_yaw,'b');
 xlabel('seconds [s]');
 ylabel('degrees [°]');
-legend('Roll','Pitch','Yaw');
+%xlim([786,850]);
+legend('Roll_z','Pitch_y','Yaw_x');
+
 title('Euler angles in body frame');
 
 %plot altitude
-subplot(4,1,3);
+subplot(5,1,3);
 plot(timestamp/1000, BME_altitude);
 xlabel('seconds [s]');
+grid on;
 ylabel('height [m]');
-legend('Altitude');
+%xlim([786,850]);
+l = legend('Altitude');
+l.FontSize = 16;
 title('Altitude');
 
+%plot states
+subplot(5,1,4);
+plot(timestamp/1000, states);
+xlabel('seconds [s]');
+ylabel('state');
+grid on;
+%xlim([786,850]);
+l = legend('states [1=armed,2=burnout,3=airbrakes,4=apogee,5=drogue,6=chute,7=landed]');
+l.FontSize = 16;
+title('State transitions');
+
+
 %plot temperature
-subplot(4,1,4);
+subplot(5,1,5);
 plot(timestamp/1000, BME_temp);
 hold on;
+grid on;
 plot(timestamp/1000, IMU_temp);
 xlabel('seconds [s]');
 ylabel('deg celsius [°/C]');
 legend('BME Temperature','IMU Temperature');
+xlim([786,850]);
 title('Temperature');
+
+%Plot states

@@ -24,8 +24,8 @@ float mass=21.58;
 
 void kalman(float* estimates, float  altitude, float acceleration, float dt, float reference_v){
   //Updating variables
-  //A_d={1,dt,0,1-dt*(drag*reference_v/mass)}; //bruker reference_v fordi vi har linearisert rundt referansepunktet. Usikker på om dette er riktig
-  A_d={1,dt,0,1};//Lurer på om dette blir A_d fordi x2_dot er akselrasjon, og det kommer inn i B
+  A_d={1,dt,0,1-dt*(drag*reference_v/mass)}; //bruker reference_v fordi vi har linearisert rundt referansepunktet. Usikker på om dette er riktig
+  //A_d={1,dt,0,1};//Lurer på om dette blir A_d fordi x2_dot er akselrasjon, og det kommer inn i B
   B_d={0,dt};
 
   //Computing kalman gain------------------------------------------------------
