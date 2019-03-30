@@ -3,14 +3,6 @@
 void runEntry();
 bool entry_ran = false;
 
-/*
-	Event detection:
-		Model rocket start accel: 86m/s^2
-
-		Sleipner:
-
-*/
-
 int armed_state(double data[]) {
 	return_code ret_code;
 
@@ -19,10 +11,10 @@ int armed_state(double data[]) {
 		entry_ran = true;
 	}
 
-	Serial.println("Waiting for z-accel input: must be larger than 12");
+	Serial.println("Waiting for y-accel input: must be larger than 15");
 
 
-	if (data[LINEAR_ACCEL_Y]*-1 > 15.0) {
+	if (data[LINEAR_ACCEL_Y] > 15.0) {
 		ret_code = NEXT;
 	}
 	else {

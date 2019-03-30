@@ -10,7 +10,7 @@
 //initilises variables
 float error = 0; //error used in controller
 float riemann_sum = 0; //used in integrator, witch is used in controller
-float u = 90; //sets servo to 90 degrees, this causes the air brakes to brake at 50% capasaty
+float u = 0;
 float dt = 0; //time step used in integrator and kalman filter
 Parameters parameters = { 1 , 1 , 1 }; //Control parameters (Kp, Ki, Kd)
 unsigned long time_old = 0; // time variable for delta time
@@ -20,12 +20,6 @@ float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 200; //reference_velovity
 bool firstIteration = true;
 
-/* Using globals defined in SD_interface.cpp instead
- 
-unsigned long logInterval = 10;
-unsigned long lastLog;
- 
-*/
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
@@ -35,7 +29,7 @@ int airbrakes_state(double data[]) {
 	dt /= (float)1000; // converted to seconds
 	time_old = data[TIMESTAMP];
 
-	kalman(estimates, data[ALTITUDE], data[ACC_Y]*-1, dt, reference_v);
+	kalman(estimates, data[ALTITUDE], data[ACC_Y], dt, reference_v);
 	
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = reference_v - estimates[1];

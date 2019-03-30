@@ -109,8 +109,20 @@ ylim([80,315]);
 legend('Altitude', 'Kalman-estimat');
 title('Altitude');
 
-figure(4);
-plot(timestamp(25545:25672)/1000, est_v2);
+%plot states
+subplot(5,1,4);
+plot(timestamp/1000, states);
+xlabel('seconds [s]');
+ylabel('state');
+xlim([0,20]);
+l = legend('states [1=armed,2=burnout,3=airbrakes,4=apogee,5=drogue,6=chute,7=landed]');
+l.FontSize = 16;
+title('State transitions');
+
+
+%plot temperature
+subplot(5,1,5);
+plot(timestamp/1000, BME_temp);
 hold on;
 plot(timestamp(25545:25672)/1000, est_v);
 legend('h_derivert', 'kalman-estimat');
