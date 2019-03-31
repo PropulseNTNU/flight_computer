@@ -8,7 +8,12 @@
 #define DrogueServoPin 2
 #define MainServoPin 3
 #define MainChuteALT 457
+#define DROGUE_DEPLOY_ANGLE 30 //Tested
+#define DROGUE_RESET_ANGLE 145 //Tested
+#define MAIN_DEPLOY_ANGLE 5 //To be tested
+#define MAIN_RESET_ANGLE 165 //To be tested
 #define DEPLOY_ATTEMPTS 5
+
 
 struct ParachuteStateStruct {
     bool drogueDeployed = false; //type uint8_t = 1 byte
