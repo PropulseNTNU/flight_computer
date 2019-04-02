@@ -46,8 +46,7 @@ int airbrakes_state(double data[]) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
 	}
 
-    //This updates the ApogeeArray with current altitude
-    //getAltitudeStruct()->updateDataArray(getAltitudeStruct(), data[ALTITUDE]);
+    // This updates the ApogeeArray with current altitude
     getAltitudeStruct()->updateDataArray(getAltitudeStruct(), (double)estimates[0]); //kalman_altitude == estimates[0]
 	
 	// write values from both airbrakes and recovery to SD card
@@ -61,7 +60,7 @@ int airbrakes_state(double data[]) {
         write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
 	}
 
-    // remmember to update this to correct tests
+    // Directly checks if average altitude falls below max altitude by a margin
 	if (apogeeDetected(getApogee(), data)) {
 		ret_code = NEXT;
 	}

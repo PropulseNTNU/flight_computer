@@ -5,19 +5,21 @@
 #include <Arduino.h>
 
 /*
- 
- When arriving at apogee, drogue chute is released immediately -> drogue_state
- 
+
+ Apogee state's main function is to deploy the drogue chute
+
  */
 
 int apogee_state(double data[]) {
     return_code ret_code;
     
+    // Deploys drogue chute instantaneously
     deployDrogueChute(data[TIMESTAMP]);
     getParachute()->drogueDeployed = true;
 
     write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
     
+    // Transitions to next state once drogue is deployed
     if (getParachute()->drogueDeployed) {
         ret_code = NEXT;
     } else {

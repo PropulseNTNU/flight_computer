@@ -2,17 +2,7 @@
 #include "Arduino.h"
 using namespace std;
 
-/*
- Various constants used in ApogeeDetect function
- */
-
-
-//Function not in use
-
-double totalAcceleration(double* data) {
-    return sqrt(sq(data[ACC_X])+sq(data[ACC_Y])+sq(data[ACC_Z]));
-}
-
+// Takes in an input_altitude and pushes it into the altitude array (FIFO)
 void updateArray(double* altitudes, double input_altitude) {
     double temp;
     if (isnan(input_altitude)) {
@@ -25,6 +15,7 @@ void updateArray(double* altitudes, double input_altitude) {
     }
 }
 
+// Updates the apogeeData variables with the updated altitude array
 void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     double sumAlt = 0;
     for (int i = 0; i < ARRAY_LEN; i++) {
@@ -36,19 +27,25 @@ void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     }
 }
 
+// Runs both updates functions - apogeeData and altitude array
 void ApogeeArray::updateDataArray(ApogeeArray* alt, double input_altitude) {
     updateArray(alt->altitudes, input_altitude);
     updateApogeeData(alt->recoveryData, alt->altitudes);
 }
 
+// Detects apogee through checking if the AVERAGE_ALTITUDE over 5 measurements drops below MAX_ALTITUDE by a set margin
 bool apogeeDetected(ApogeeArray* apogee, double* data) {
-    if ((apogee->recoveryData[MAX_ALTITUDE] - apogee->recoveryData[AVERAGE_ALTITUDE]) > APOGEE_ALTITUDE_MARGIN) { //Descending -> apogee
+    if ((apogee->recoveryData[MAX_ALTITUDE] - apogee->recoveryData[AVERAGE_ALTITUDE]) > APOGEE_ALTITUDE_MARGIN) {
         apogee->recoveryData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
         return true;
     } else {
         return false;
     }
 }
+
+/*
+
+Helper functions
 
 
 void printArray(double* array) {
@@ -67,7 +64,14 @@ void printApogeeArray(ApogeeArray alt) {
     printArray(alt.altitudes);
 }
 
-/*
+
+Section below can be used to detect apogee using a combination of total acceleration and altitude.
+
+
+double totalAcceleration(double* data) {
+    return sqrt(sq(data[ACC_X])+sq(data[ACC_Y])+sq(data[ACC_Z]));
+}
+
 //Option to add Average difference condition.
 bool apogeeDetected(ApogeeArray* apogee, double* data, int enable_acc) {
     double accMagnitude = totalAcceleration(data); //Magnitude of acceleration in x,y,z
