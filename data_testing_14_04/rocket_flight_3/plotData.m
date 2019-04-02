@@ -1,12 +1,7 @@
 filename = 'DATAFILE.TXT';
-recFilename = 'RECFILE.TXT';
 delimiterIn = ',';
 headerlinesIn = 0;
 data = importdata(filename,delimiterIn,headerlinesIn);
-recData = importdata(recFilename,delimiterIn,headerlinesIn);
-
-startInterval = 796;
-endInterval = 802;
 
 %%TODO: IMU_temp = IMU_YAW
 
@@ -38,96 +33,69 @@ IMU_quaternion_y = data(:,25);
 IMU_quaternion_z = data(:,26);
 IMU_quaternion_w = data(:,27);
 states = data(:,28);
-Average_Height = recData(:,4);
 
 figure(1);
-%{
-%Plotting Linear Acceleration
+%plot Acceleration
 subplot(5,1,1);
 
 plot(timestamp/1000, IMU_lin_accel_x,'r');
 hold on;
-plot(timestamp/1000, IMU_lin_accel_y,'g');
+plot(timestamp/1000, -1*IMU_lin_accel_y,'g');
 plot(timestamp/1000, IMU_lin_accel_z,'b');
 grid on;
 xlabel('seconds [s]');
 ylabel('acceleration [m/s^2]');
 l = legend('Lin\_Accel_x','Lin\_Accel_y','Lin\_Accel_z');
-xlim([startInterval, endInterval]);
+xlim([786,850]);
 title('Accelerations without gravity');
 
-%plot total Linear Acceleration
+%plot ROLL/PITCH/YAW
 subplot(5,1,2);
-IMU_total_mag = sqrt(IMU_mag_x.^2 + IMU_mag_y.^2 +IMU_mag_z.^2);
-plot(timestamp/1000, IMU_mag_y,'r');
+plot(timestamp/1000, IMU_roll,'r');
 hold on;
 grid on;
+plot(timestamp/1000, IMU_pitch,'g');
+plot(timestamp/1000, IMU_yaw,'b');
 xlabel('seconds [s]');
-ylabel('Something Tesla [xT]');
-l = legend('Total\_Mag\_field\_strength_x');
-xlim([startInterval,endInterval]);
-title('Total magnetic field strength');
-%}
+ylabel('degrees [°]');
+xlim([786,850]);
+legend('Roll_z','Pitch_y','Yaw_x');
 
-
-%plot Acceleration
-subplot(5,1,2);
-
-plot(timestamp/1000, IMU_acc_x,'r');
-hold on;
-plot(timestamp/1000, -1*IMU_acc_y,'g');
-plot(timestamp/1000, IMU_acc_z,'b');
-grid on;
-xlabel('seconds [s]');
-ylabel('acceleration [m/s^2]');
-l = legend('Accel_x','Accel_y','Accel_z');
-xlim([startInterval,endInterval]);
-title('Accelerations with gravity');
-
-%plot total Acceleration
-subplot(5,1,3);
-IMU_total_accel = sqrt(IMU_acc_x.^2 + IMU_acc_y.^2 +IMU_acc_z.^2);
-plot(timestamp/1000, IMU_total_accel,'r');
-hold on;
-grid on;
-xlabel('seconds [s]');
-ylabel('acceleration [m/s^2]');
-l = legend('Total\_Accel_x');
-xlim([startInterval,endInterval]);
-title('Total accelerations with gravity');
-
-
-%plot total Acceleration
-subplot(5,1,1);
-IMU_total_lin_accel = sqrt(IMU_lin_accel_x.^2 + IMU_lin_accel_y.^2 +IMU_lin_accel_z.^2);
-plot(timestamp/1000, IMU_total_lin_accel,'r');
-hold on;
-grid on;
-xlabel('seconds [s]');
-ylabel('acceleration [m/s^2]');
-l = legend('Total\_Lin\_Accel_x');
-xlim([startInterval,endInterval]);
-title('Total accelerations without gravity');
+title('Euler angles in body frame');
 
 %plot altitude
-subplot(5,1,4);
+subplot(5,1,3);
 plot(timestamp/1000, BME_altitude);
 xlabel('seconds [s]');
 grid on;
 ylabel('height [m]');
-xlim([startInterval,endInterval]);
+xlim([786,850]);
 l = legend('Altitude');
 l.FontSize = 16;
 title('Altitude');
 
 %plot states
-subplot(5,1,5);
+subplot(5,1,4);
 plot(timestamp/1000, states);
 xlabel('seconds [s]');
 ylabel('state');
 grid on;
-xlim([startInterval,endInterval]);
+xlim([786,850]);
 l = legend('states [1=armed,2=burnout,3=airbrakes,4=apogee,5=drogue,6=chute,7=landed]');
 l.FontSize = 16;
 title('State transitions');
+
+
+%plot temperature
+subplot(5,1,5);
+plot(timestamp/1000, BME_temp);
+hold on;
+grid on;
+plot(timestamp/1000, IMU_temp);
+xlabel('seconds [s]');
+ylabel('deg celsius [°/C]');
+legend('BME Temperature','IMU Temperature');
+xlim([786,850]);
+title('Temperature');
+
 %Plot states

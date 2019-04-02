@@ -3,9 +3,6 @@ delimiterIn = ',';
 headerlinesIn = 0;
 data = importdata(filename,delimiterIn,headerlinesIn);
 
-startInterval = 1447;
-endInterval = 1451;
-
 %%TODO: IMU_temp = IMU_YAW
 
 timestamp = data(:,1)-data(1,1);
@@ -38,7 +35,7 @@ IMU_quaternion_w = data(:,27);
 states = data(:,28);
 
 figure(1);
-%plot Linear Acceleration
+%plot Acceleration
 subplot(5,1,1);
 plot(timestamp/1000, IMU_lin_accel_x,'r');
 hold on;
@@ -47,59 +44,33 @@ plot(timestamp/1000, IMU_lin_accel_z,'b');
 xlabel('seconds [s]');
 ylabel('acceleration [m/s^2]');
 legend('Lin\_Accel_x','Lin\_Accel_y','Lin\_Accel_z');
-xlim([startInterval,endInterval]);
-title('Linear Accelerations');
+xlim([1430,1520]);
+title('Accelerations');
 
-%plot Acceleration
+%plot ROLL/PITCH/YAW
 subplot(5,1,2);
-
-plot(timestamp/1000, IMU_acc_x,'r');
+plot(timestamp/1000, IMU_roll,'r');
 hold on;
-plot(timestamp/1000, IMU_acc_y,'g');
-plot(timestamp/1000, IMU_acc_z,'b');
+plot(timestamp/1000, IMU_pitch,'g');
+plot(timestamp/1000, IMU_yaw,'b');
 xlabel('seconds [s]');
-ylabel('acceleration [m/s^2]');
-xlim([startInterval,endInterval]);
-legend('Acceleration_x','Acceleration_y','Acceleration_z');
+ylabel('degrees [°]');
+xlim([1430,1520]);
+legend('Roll_z','Pitch_y','Yaw_x');
 
-title('Acceleration');
-
-%plot Total Acceleration
-subplot(5,1,3);
-total_lin_acc = sqrt(IMU_lin_accel_x.^2 + IMU_lin_accel_y.^2 + IMU_lin_accel_z.^2);
-total_acc = sqrt(IMU_acc_x.^2 + IMU_acc_y.^2 + IMU_acc_z.^2);
-plot(timestamp/1000, total_acc,'r');
-xlabel('seconds [s]');
-ylabel('acceleration [m/s^2]');
-xlim([startInterval,endInterval]);
-legend('Total\_Acceleration');
-
-title('Total Acceleration');
-
-%{
-%plot Total Linear Acceleration
-subplot(5,1,3);
-total_lin_acc = sqrt(IMU_lin_accel_x.^2 + IMU_lin_accel_y.^2 + IMU_lin_accel_z.^2);
-plot(timestamp/1000, total_lin_acc,'r');
-xlabel('seconds [s]');
-ylabel('acceleration [m/s^2]');
-xlim([startInterval,endInterval]);
-legend('Total\_Linear\_Acceleration');
-
-title('Total Linear Acceleration');
-%}
+title('Euler angles in body frame');
 
 %plot altitude
-subplot(5,1,4);
+subplot(5,1,3);
 plot(timestamp/1000, BME_altitude);
 xlabel('seconds [s]');
 ylabel('height [m]');
-xlim([startInterval,endInterval]);
+xlim([1430,1520]);
 legend('Altitude');
 title('Altitude');
 
 %plot states
-subplot(5,1,5);
+subplot(5,1,4);
 plot(timestamp/1000, states);
 xlabel('seconds [s]');
 ylabel('state');
@@ -108,3 +79,16 @@ l = legend('states [1=armed,2=burnout,3=airbrakes,4=apogee,5=drogue,6=chute,7=la
 l.FontSize = 16;
 title('State transitions');
 
+
+%plot temperature
+subplot(5,1,5);
+plot(timestamp/1000, BME_temp);
+hold on;
+plot(timestamp/1000, IMU_temp);
+xlabel('seconds [s]');
+ylabel('deg celsius [°/C]');
+legend('BME Temperature','IMU Temperature');
+xlim([1430,1520]);
+title('Temperature');
+
+%Plot states

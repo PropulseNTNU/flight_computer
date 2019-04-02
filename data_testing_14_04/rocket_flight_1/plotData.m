@@ -1,9 +1,8 @@
 filename = 'DATAFILE.TXT';
 delimiterIn = ',';
 headerlinesIn = 0;
-data = importdata(filename,delimiterIn,headerlinesIn)
-startInterval = 430;
-endInterval = 445;
+data = importdata(filename,delimiterIn,headerlinesIn);
+
 %%TODO: IMU_temp = IMU_YAW
 
 timestamp = data(:,1)-data(1,1);
@@ -45,46 +44,51 @@ plot(timestamp/1000, IMU_lin_accel_z,'b');
 xlabel('seconds [s]');
 ylabel('acceleration [m/s^2]');
 legend('Lin\_Accel_x','Lin\_Accel_y','Lin\_Accel_z');
-xlim([startInterval,endInterval]);
-title('Linear acceleration');
+xlim([430,520]);
+title('Accelerations');
 
-%plot Acceleration
+%plot ROLL/PITCH/YAW
 subplot(5,1,2);
-plot(timestamp/1000, IMU_acc_x,'r');
+plot(timestamp/1000, IMU_roll,'r');
 hold on;
-plot(timestamp/1000, IMU_acc_y,'g');
-plot(timestamp/1000, IMU_acc_z,'b');
+plot(timestamp/1000, IMU_pitch,'g');
+plot(timestamp/1000, IMU_yaw,'b');
 xlabel('seconds [s]');
-ylabel('acceleration [m/s^2]');
-xlim([startInterval,endInterval]);
-legend('Acceleration_z','Acceleration_y','Acceleration_x');
-title('Acceleration');
+ylabel('degrees [°]');
+xlim([430,520]);
+legend('Roll_z','Pitch_y','Yaw_x');
 
-%plot Acceleration
-subplot(5,1,3);
-totalAcc = sqrt(IMU_acc_x.^2 + IMU_acc_y.^2 + IMU_acc_z.^2)
-plot(timestamp/1000, totalAcc,'r');
-xlabel('seconds [s]');
-ylabel('acceleration [m/s^2]');
-xlim([startInterval,endInterval]);
-legend('Total acceleration')
-title('Total Acceleration');
+title('Euler angles in body frame');
 
 %plot altitude
-subplot(5,1,4);
+subplot(5,1,3);
 plot(timestamp/1000, BME_altitude);
 xlabel('seconds [s]');
-xlim([startInterval,endInterval]);
+ylabel('height [m]');
+xlim([430,520]);
 legend('Altitude');
 title('Altitude');
 
 %plot states
-subplot(5,1,5);
+subplot(5,1,4);
 plot(timestamp/1000, states);
 xlabel('seconds [s]');
 ylabel('state');
-xlim([startInterval,endInterval]);
-legend('states');
+xlim([430,550]);
 l = legend('states [1=armed,2=burnout,3=airbrakes,4=apogee,5=drogue,6=chute,7=landed]');
 l.FontSize = 16;
 title('Altitude');
+
+
+%plot temperature
+subplot(5,1,5);
+plot(timestamp/1000, BME_temp);
+hold on;
+plot(timestamp/1000, IMU_temp);
+xlabel('seconds [s]');
+ylabel('deg celsius [°/C]');
+legend('BME Temperature','IMU Temperature');
+xlim([430,520]);
+title('Temperature');
+
+%Plot states
