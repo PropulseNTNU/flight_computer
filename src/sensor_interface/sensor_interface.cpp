@@ -95,6 +95,9 @@ void readSensors(double *data){
   data[ALTITUDE_GPS] = gps->getAltitude();
   data[LONGITUDE_GPS] = gps->getLongitude();
   data[LATITUDE_GPS] = gps->getLatitude();
+
+  // Read the potentiometer values from the airbrakes
+  data[AIRBRAKES_SERVO_POS] = analogRead(A9);
   
   //data[TIMESTAMP]= event.timestamp;
   data[TIMESTAMP] = millis();
