@@ -3,7 +3,7 @@
 #include <Servo.h>
 
 #define AIRBRAKES_SERVO_PIN 2
-#define DROUGE_SERVO_PIN 3
+#define DROGUE_SERVO_PIN 3
 #define MAIN_SERVO_PIN 4
 
 enum servoEnum {
