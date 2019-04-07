@@ -20,12 +20,6 @@ float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 200; //reference_velovity
 bool firstIteration = true;
 
-/* Using globals defined in SD_interface.cpp instead
- 
-unsigned long logInterval = 10;
-unsigned long lastLog;
- 
-*/
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
@@ -38,13 +32,8 @@ int airbrakes_state(double data[]) {
 	kalman(estimates, data[ALTITUDE], data[ACC_Y], dt, reference_v);
 	
 	reference_v = getReferenceVelocity(estimates[0]);
-	error = reference_v - estimates[1];
-<<<<<<< HEAD
+	error = estimates[1] - reference_v ;
 	u = controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
-=======
-
-	u += controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
->>>>>>> 2d5904757935e46a53543a3f9ca51bd46179b8ce
 
 	// write error and controll signal too file before if statement
 	if(u >= 0 && u <= 180) {
