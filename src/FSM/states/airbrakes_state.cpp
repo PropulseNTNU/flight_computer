@@ -10,7 +10,7 @@ float error = 0; //error used in controller
 float riemann_sum = 0; //used in integrator, witch is used in controller
 float u = 90; //sets servo to 90 degrees, this causes the air brakes to brake at 50% capasaty
 float dt = 0; //time step used in integrator and kalman filter
-Parameters parameters = { 1 , 1 , 1 }; //Control parameters (Kp, Ki, Kd)
+Parameters parameters = { 1 , 0.01 , 1 }; //Control parameters (Kp, Ki, Kd)
 unsigned long time_old = 0; // time variable for delta time
 
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
@@ -33,7 +33,7 @@ int airbrakes_state(double data[]) {
 	
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = reference_v - estimates[1];
-	u += controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
+	u = controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
 
 	// write error and controll signal too file before if statement
 	if(u >= 0 && u <= 180) {
