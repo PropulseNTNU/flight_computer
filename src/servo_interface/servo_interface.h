@@ -10,7 +10,7 @@ enum servoEnum {
     AIRBRAKES_SERVO, DROGUE_SERVO, MAIN_SERVO, NUM_SERVOS
 };
 
-void init_servo(int servo, int pin);
+void init_servo(int servo, int pin, int min_pulse, int max_pulse);
 
 Servo* get_servo(int servo);
 #endif
