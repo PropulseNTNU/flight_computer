@@ -17,7 +17,7 @@ unsigned long time_old = 0; // time variable for delta time
 
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
 float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
-float reference_v= 200; //reference_velovity
+float reference_v= 0; //reference_velovity
 bool firstIteration = true;
 
 
@@ -36,7 +36,7 @@ int airbrakes_state(double data[]) {
 	u = controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
 
 	// write error and controll signal too file before if statement
-	if(u >= 0 && u <= 180) {
+	if(u >= 0 && u <= 90) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
 	}
     
@@ -54,7 +54,8 @@ int airbrakes_state(double data[]) {
 
     // remmember to update this to correct tests
 	if (apogeeDetected(getApogee(), data)) {
-		ret_code = REPEAT;
+		get_servo(AIRBRAKES_SERVO)->write(0); 
+		ret_code = NEXT;
 	}
 	else {
 		ret_code = REPEAT;

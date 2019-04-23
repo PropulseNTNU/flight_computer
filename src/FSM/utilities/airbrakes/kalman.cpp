@@ -10,8 +10,8 @@ const Matrix<2,2> E_d={0.01, 0, 0, 0.01};
 const Matrix<2,2> Q={90, 0 ,0 , 1000};
 const float R=1; //Litt usikker på om R skal være en matrise eller en skalar. trodde egentlig den skulle være en matrise.
 const Matrix<2,2> I={1,0,0,1};
-Matrix<2,2> P_k_bar={1,0,0.1,0};
-Matrix<2,1>x_hat_bar={1250,241};// skal være ganske nøyaktig utifra simuleringene
+Matrix<2,2> P_k_bar={1,0,0,0.1};
+Matrix<2,1>x_hat_bar={1287, 262};// skal være ganske nøyaktig utifra simuleringene
 Matrix<2,1> x_hat;
 Matrix<2,1> K_k;
 Matrix<2,1> Z;

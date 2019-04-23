@@ -130,8 +130,8 @@ void setup()
 
   // init servos
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN, 800, 2200);
-  init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN); // legg til min max pulse
-  init_servo(MAIN_SERVO, MAIN_SERVO_PIN); //legg til min max pulse
+  init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 ); // legg til RIKTIG min max pulse
+  init_servo(MAIN_SERVO, MAIN_SERVO_PIN,  800, 2200); //legg til RIKTIG min max pulse
 }
 
 void loop()
