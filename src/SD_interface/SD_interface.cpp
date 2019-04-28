@@ -3,6 +3,7 @@
 
 File files[NUM_FILES];
 
+
 unsigned long logIntervals[NUM_INTERVALS] = {10, 10, 100, 1000};
 unsigned long lastLog[NUM_LASTLOGS];
 
@@ -66,4 +67,17 @@ unsigned long* getLastLog(int lastLogType) {
 
 void setLastLog(unsigned long newLastLog, int lastLogType) {
     lastLog[lastLogType] = newLastLog;
+}
+
+void read_demo_from_SD(File* demo_file, double * data, int len) {
+  static int time = millis();
+  if (millis() - time >= TIMESTEP) {
+    time = millis();
+    if (demo_file->available() >= len * sizeof(double)) {
+          demo_file->read((char*) data, len * sizeof(double));
+    }
+    else {
+      Serial.println("End of demo.");
+    }
+  }
 }

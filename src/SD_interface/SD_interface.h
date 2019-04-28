@@ -3,6 +3,10 @@
 
 #include <SD.h>
 
+#define DEMO_DATA_FILE "LAUNCH_file_MAINTM.mat"
+#define TIMESTEP 0.003
+
+
 enum fileEnum {
     DATA_FILE, AIRBRAKES_FILE, RECOVERY_FILE, NUM_FILES
 };
@@ -27,5 +31,7 @@ unsigned long* getLogInterval(int interval);
 unsigned long* getLastLog(int lastLogType);
 
 void setLastLog(unsigned long newLastLog, int lastLogType);
+
+void read_demo_from_SD(File* demo_file, double* data, int len);
 
 #endif

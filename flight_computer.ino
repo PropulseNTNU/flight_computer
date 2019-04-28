@@ -60,6 +60,8 @@ double data[NUM_TYPES];
 //Init xbee
 XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
 
+File demo_file;
+
 void setup()
 {
   
@@ -115,6 +117,13 @@ void setup()
       else{
           Serial.println("Failed to opened file(s) on SD card");
       }
+
+    demo_file = SD.open(DEMO_DATA_FILE, FILE_READ);
+    if (!demo_file) {
+      Serial.println("Successfully opened demo file.");
+    } else {
+      Serial.println("Failed to open demo file.");
+    }
   }
   delay(1000);
 
@@ -137,6 +146,7 @@ void setup()
 void loop()
 { 
   //readSensors(data);
+  read_demo_from_SD(&demo_file, data, NUM_TYPES);
   data[TIMESTAMP] = millis();
   
   //Running the state machine
