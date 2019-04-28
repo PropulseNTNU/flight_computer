@@ -16,6 +16,7 @@
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
 
+
 /*
     Setup of adresses
  */
@@ -59,6 +60,11 @@ double data[NUM_TYPES];
 
 //Init xbee
 XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
+
+//Bluetooth
+// ce, csn pins
+RF24 radio(CE_PIN, CSN_PIN); 
+const byte address[6] = "00001";
 
 void setup()
 {
@@ -132,10 +138,31 @@ void setup()
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN, 800, 2200);
   init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 ); // legg til RIKTIG min max pulse
   init_servo(MAIN_SERVO, MAIN_SERVO_PIN,  800, 2200); //legg til RIKTIG min max pulse
+
+  //radio setup 
+  radio.begin();
+  radio.openReadingPipe(0, address);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.startListening();
 }
+
+bool launch = false;
 
 void loop()
 { 
+  while(!launch){
+    if (radio.available()) {
+      char text[32] = "";
+      radio.read(&text, sizeof(text));
+      Serial.println(text);
+      if(atoi(text) == 1) {
+        launch = true;
+      }
+    }
+  }
+  
+ 
+
   //readSensors(data);
   data[TIMESTAMP] = millis();
   
