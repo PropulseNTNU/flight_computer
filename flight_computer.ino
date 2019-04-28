@@ -16,6 +16,10 @@
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
 
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+
 
 /*
     Setup of adresses
@@ -63,6 +67,8 @@ XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
 
 //Bluetooth
 // ce, csn pins
+#define CE_PIN 6
+#define CSN_PIN 7
 RF24 radio(CE_PIN, CSN_PIN); 
 const byte address[6] = "00001";
 
@@ -159,6 +165,7 @@ void loop()
         launch = true;
       }
     }
+    Serial.println("Waiting for 1.");
   }
   
  
