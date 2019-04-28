@@ -1,4 +1,4 @@
-# Flight Computer
+# Flight Computer demo branch
 
 This repository contains the code necessary to run the flight computer including sensors and the state machine.
 
