@@ -1,5 +1,5 @@
 #include "kalman.h"
-#include <BasicLinearAlgebra.h>
+#include "../BasicLinearAlgebra/BasicLinearAlgebra.h"
 using namespace BLA;
 
 //Initiates matrices needed in the kalman filter
