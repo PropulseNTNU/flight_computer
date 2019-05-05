@@ -67,7 +67,7 @@ int messageFromPayload(double* data){
     double msg = atof(message);
     int id = messageID.toInt(); 
         
-    data[id] = msg;
+    data[id-1] = msg;
     return 1;
   }
       
@@ -76,13 +76,13 @@ int messageFromPayload(double* data){
 }
 
 void updateDataFromBle(double* data){
-  for(int i = 0; i < (NUMBER_OF_SENSORS - 1); i++){
+  //for(int i = 0; i < (NUMBER_OF_SENSORS - 1); i++){
     int checkReading = messageFromPayload(data);
-    if(!(checkReading)){
-      Serial.println("No reading");;
-    }
+    //if(!(checkReading)){
+      //Serial.println("No reading");;
+    //}
     
-  }
+  //}
 
 }
 

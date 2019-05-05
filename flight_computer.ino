@@ -61,13 +61,14 @@ unsigned long prevLogTime;
 double data[NUM_TYPES];
 
 //Init bluetooth data array
-const int NUM_SENSORS = NUMBER_OF_SENSORS - 1;
+const int NUM_SENSORS = NUMBER_OF_SENSORS;
 double payloadData[NUM_SENSORS]; 
 
 
 //Init xbee
 XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]), (void*) payloadData, NUM_SENSORS * sizeof(data[0]));
 
+int iteration = 0;
 
 void setup()
 {
@@ -197,6 +198,7 @@ void setup()
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN);
   init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN);
   init_servo(MAIN_SERVO, MAIN_SERVO_PIN);
+  
 }
 
 void loop()
@@ -207,7 +209,7 @@ void loop()
   updateDataFromBle(payloadData);
   //for testing bluetooth data
   Serial.println("Data recieved:");
-  for(int i= 0; i < 13; i++){
+  for(int i= 0; i < NUM_SENSORS; i++){
     Serial.println(payloadData[i]);
   }
   Serial.println("Data end recieved:");
@@ -216,25 +218,20 @@ void loop()
   
   //Running the state machine
   state_function = state_funcs[current_state];
-  Serial.println("End loop 7");
+  
   ret_code = return_code(state_function(data));
-  Serial.println("End loop 5");
   current_state = lookup_transition(current_state, ret_code);
-  Serial.println("End loop 4");
   data[STATE] = current_state;
-  Serial.println("End loop 1");
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
     get_IMU()->begin();
     delay(100);
   }
-  Serial.println("End loop 2");
-  //Starting writing to SD card when ARMED 
+   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
       prevLogTime = millis();
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
-  Serial.println("End loop 3");
   Serial.print("Current state: ");
   Serial.println(data[STATE]);
   Serial.print("Current gps altitude: ");
@@ -242,5 +239,8 @@ void loop()
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
   xbee.transmit();
-  Serial.println("End loop");
+  iteration++;
+  Serial.println("Iteration: ");
+  Serial.println(iteration);
+  
 }
