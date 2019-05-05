@@ -210,27 +210,31 @@ void loop()
   for(int i= 0; i < 13; i++){
     Serial.println(payloadData[i]);
   }
+  Serial.println("Data end recieved:");
   //test end
   
   
   //Running the state machine
   state_function = state_funcs[current_state];
+  Serial.println("End loop 7");
   ret_code = return_code(state_function(data));
+  Serial.println("End loop 5");
   current_state = lookup_transition(current_state, ret_code);
+  Serial.println("End loop 4");
   data[STATE] = current_state;
-
+  Serial.println("End loop 1");
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
     get_IMU()->begin();
     delay(100);
   }
-  
+  Serial.println("End loop 2");
   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
       prevLogTime = millis();
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
-
+  Serial.println("End loop 3");
   Serial.print("Current state: ");
   Serial.println(data[STATE]);
   Serial.print("Current gps altitude: ");
@@ -238,4 +242,5 @@ void loop()
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
   xbee.transmit();
+  Serial.println("End loop");
 }
