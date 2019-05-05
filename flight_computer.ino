@@ -68,7 +68,6 @@ double payloadData[NUM_SENSORS];
 //Init xbee
 XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]), (void*) payloadData, NUM_SENSORS * sizeof(data[0]));
 
-int iteration = 0;
 
 void setup()
 {
@@ -238,9 +237,5 @@ void loop()
   Serial.println(data[ALTITUDE_GPS]);
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
-  xbee.transmit();
-  iteration++;
-  Serial.println("Iteration: ");
-  Serial.println(iteration);
-  
+  xbee.transmit();  
 }
