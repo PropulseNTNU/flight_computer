@@ -3,7 +3,7 @@
 
 File files[NUM_FILES];
 
-unsigned long logIntervals[NUM_INTERVALS] = {10, 10, 100, 1000};
+unsigned long logIntervals[NUM_INTERVALS] = {10, 10, 10, 100};
 unsigned long lastLog[NUM_LASTLOGS];
 
 time_t getTeensy3Time()

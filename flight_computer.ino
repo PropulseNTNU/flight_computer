@@ -128,10 +128,14 @@ void setup()
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, HIGH);
 
-  // init servos
+  // Initialise servos
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN, 800, 2200);
-  init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 ); // legg til RIKTIG min max pulse
-  init_servo(MAIN_SERVO, MAIN_SERVO_PIN,  800, 2200); //legg til RIKTIG min max pulse
+  init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 );
+  init_servo(MAIN_SERVO, MAIN_SERVO_PIN, 800, 2200);
+
+  // Initialise and hold drogue and main chute positions throughout launch
+  get_servo(DROGUE_SERVO)->write(DROGUE_RESET_ANGLE);
+  get_servo(MAIN_SERVO)->write(MAIN_RESET_ANGLE);
 }
 
 void loop()
