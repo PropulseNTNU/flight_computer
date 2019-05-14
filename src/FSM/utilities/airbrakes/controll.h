@@ -9,7 +9,7 @@ typedef struct Parameters_t {
 }ControlParameters;
 
 
-float controller(float* error, Parameters* parameters, float* riemann_sum, float dt);
+float controller(float* error, ControlParameters* parameters, float* riemann_sum, float dt);
 float integrate(float prev_sum, float value, float step);
 
 
