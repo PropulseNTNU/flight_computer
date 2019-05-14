@@ -51,7 +51,7 @@ return_code ret_code = REPEAT;
     Initialization of the data file names.
     IMPORTANT!!!: If the names are too long you will fail to write to the file.......(use short file names)
  */
-String dataFileName = "Data.txt";
+String dataFileName = "Data1.txt";
 String airbrakesFileName = "Ab.txt";
 String recoveryFileName = "Rec.txt";
 
@@ -71,6 +71,7 @@ XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
 #define CSN_PIN 7
 RF24 radio(CE_PIN, CSN_PIN); 
 const byte address[6] = "00001";
+File demo_file;
 
 void setup()
 {
@@ -127,6 +128,14 @@ void setup()
       else{
           Serial.println("Failed to opened file(s) on SD card");
       }
+
+    String demoFileName = "DATA.TXT";
+    demo_file = SD.open(demoFileName.c_str(), FILE_READ);
+    if (demo_file) {
+      Serial.println("Successfully opened demo file.");
+    } else {
+      Serial.println("Failed to open demo file.");
+    }
   }
   delay(1000);
 
@@ -156,7 +165,7 @@ bool launch = false;
 
 void loop()
 { 
-  while(!launch){
+  /*while(!launch){
     if (radio.available()) {
       char text[32] = "";
       radio.read(&text, sizeof(text));
@@ -166,12 +175,16 @@ void loop()
       }
     }
     Serial.println("Waiting for 1.");
-  }
+  }*/
   
  
 
   //readSensors(data);
-  data[TIMESTAMP] = millis();
+  read_demo_from_SD(&demo_file, data, 7);
+  //data[TIMESTAMP] = millis();
+
+  Serial.print("Time: ");
+  Serial.println(data[1], 5);
   
   //Running the state machine
   state_function = state_funcs[current_state];

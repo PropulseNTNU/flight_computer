@@ -27,10 +27,12 @@ void XBee::reset(void) {
 }
 
 void XBee::transmit(void) {
+    static uint8_t payload_dummy[13*sizeof(double)] = {};
     if(millis()-timer > TIMER_DELAY) {
         Serial5.write('<');
         Serial5.write((uint8_t*)&(++package_number), sizeof(package_number));
         Serial5.write(sensors, num_sens_bytes);
+        Serial5.write(payload_dummy, 13*sizeof(double));
         Serial5.write('>');
         timer = millis();
     }
