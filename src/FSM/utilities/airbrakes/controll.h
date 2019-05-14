@@ -6,7 +6,7 @@ typedef struct Parameters_t {
   float kpp;
   float kpi;
   float kpd;
-}Parameters;
+}ControlParameters;
 
 
 float controller(float* error, Parameters* parameters, float* riemann_sum, float dt);
