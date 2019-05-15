@@ -20,15 +20,23 @@ float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 0; //reference_velovity
 
 
+
 int airbrakes_state(double data[]) {
 	return_code ret_code;
     
 	//Updats dt
-	dt = (float)(data[TIMESTAMP] - time_old);
+	float t = millis();
+	dt = (float)(t- time_old);
 	dt /= (float)1000; // converted to seconds
-	time_old = data[TIMESTAMP];
+	time_old = t;
+	if(dt > 0 && t > 0){
+		dt = 0.03/(t/dt);
+		}
+	else{
+		dt = 0.01;
+		}
 
-	kalman(estimates, data[ALTITUDE], data[ACC_Y], dt, reference_v);
+	kalman(estimates, data[1], data[2], dt, reference_v);
 	
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = estimates[1] - reference_v ;
@@ -37,6 +45,8 @@ int airbrakes_state(double data[]) {
 	// write error and controll signal too file before if statement
 	if(u >= 0 && u <= 75) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
+		Serial.print("c_s");
+		Serial.println(u);
 	}
 
     // This updates the ApogeeArray with current altitude
@@ -46,7 +56,7 @@ int airbrakes_state(double data[]) {
 	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
 		setLastLog(millis(), COMMON_LASTLOG);
 		// these values may be nan during testing since the lookup table or sensors may be missing
-		double abValues[4] = {data[TIMESTAMP], estimates[0], estimates[1], u};
+		double abValues[4] = {data[0], estimates[0], estimates[1], u};
 		write_SD(AIRBRAKES_FILE, abValues, 4);
         // writing recovery values
 		write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);

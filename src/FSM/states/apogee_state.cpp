@@ -14,7 +14,7 @@ int apogee_state(double data[]) {
     return_code ret_code;
     
     // Deploys drogue chute instantaneously
-    deployDrogueChute(data[TIMESTAMP]);
+    deployDrogueChute(data[0]);
     getParachute()->drogueDeployed = true;
 
     write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);

@@ -15,6 +15,7 @@
 #include "src/servo_interface/servo_interface.h"
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
+#include "src/serial_interface/serial_reader.h"
 
 /*
     Setup of adresses
@@ -141,13 +142,15 @@ void setup()
 void loop()
 { 
   //readSensors(data);
-  data[TIMESTAMP] = millis();
+  updateSensorData(data);
   
   //Running the state machine
   state_function = state_funcs[current_state];
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
   data[STATE] = current_state;
+  Serial.print("state");
+  Serial.println(data[STATE]);
 
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
@@ -161,6 +164,7 @@ void loop()
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
 
+  
   /*Serial.print("Current state: ");
   Serial.println(data[STATE]);
   Serial.print("Current gps altitude: ");

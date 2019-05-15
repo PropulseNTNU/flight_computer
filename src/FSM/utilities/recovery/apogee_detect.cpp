@@ -36,7 +36,7 @@ void ApogeeArray::updateDataArray(ApogeeArray* alt, double input_altitude) {
 // Detects apogee through checking if the AVERAGE_ALTITUDE over 5 measurements drops below MAX_ALTITUDE by a set margin
 bool apogeeDetected(ApogeeArray* apogee, double* data) {
     if ((apogee->recoveryData[MAX_ALTITUDE] - apogee->recoveryData[AVERAGE_ALTITUDE]) > APOGEE_ALTITUDE_MARGIN) {
-        apogee->recoveryData[TIMESTAMP_APOGEE] = data[TIMESTAMP];
+        apogee->recoveryData[TIMESTAMP_APOGEE] = data[0];
         return true;
     } else {
         return false;

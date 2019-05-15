@@ -14,7 +14,7 @@ int chute_state(double data[]) {
     return_code ret_code;
     
     // This updates the altitude array with current altitude, done here to access altitude table
-    getAltitudeStruct()->updateDataArray(getAltitudeStruct(), data[ALTITUDE]);
+    getAltitudeStruct()->updateDataArray(getAltitudeStruct(), data[1]);
     
     // Write to SD card
     if ((millis() - *getLastLog(COMMON_LASTLOG) >= *getLogInterval(CHUTE_INTERVAL))) {
@@ -22,7 +22,7 @@ int chute_state(double data[]) {
         write_SD(RECOVERY_FILE, getAltitudeStruct()->recoveryData, RECOVERY_DATA_LEN);
     }
     
-    if (data[ALTITUDE] <= 5) {
+    if (data[1] <= 5) {
         ret_code = NEXT;
     } else {
         ret_code = REPEAT;
