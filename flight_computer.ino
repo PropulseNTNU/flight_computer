@@ -16,6 +16,9 @@
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
 #include "src/serial_interface/serial_reader.h"
+#include "src/bluetooth/bluetooth.h"
+
+
 
 /*
     Setup of adresses
@@ -58,8 +61,14 @@ unsigned long prevLogTime;
 //Init data array
 double data[NUM_TYPES];
 
+//Init bluetooth data array
+const int NUM_SENSORS = NUMBER_OF_SENSORS;
+double payloadData[NUM_SENSORS]; 
+
+
 //Init xbee
-XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
+XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]), (void*) payloadData, NUM_SENSORS * sizeof(data[0]));
+
 
 void setup()
 {
@@ -122,6 +131,17 @@ void setup()
   //Calibrate BME pressure sensor to read 0m altitude at current location
   calibrateAGL();
 
+
+  //
+  Serial.println("Setup for recieving bluetooth communication");
+  if (setupBle(payloadData, NUM_SENSORS))
+  {
+    Serial.println("Bluetooth setup done");
+  }
+  else {
+    Serial.println("Bluetooth crashed");
+  } 
+
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
 
@@ -143,11 +163,23 @@ void setup()
 
 void loop()
 { 
-  //readSensors(data);
-  updateSensorData(data);
+  readSensors(data);
+  //updateSensorData(data);
+  
+  //bluetooth
+  updateDataFromBle(payloadData);
+  //for testing bluetooth data
+  Serial.println("Data recieved:");
+  for(int i= 0; i < NUM_SENSORS; i++){
+    Serial.println(payloadData[i]);
+  }
+  Serial.println("Data end recieved:");
+  //test end
+  
   
   //Running the state machine
   state_function = state_funcs[current_state];
+  
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
   data[STATE] = current_state;
@@ -181,6 +213,11 @@ void loop()
 		  Serial.println(0);
   }
   
-
-  xbee.transmit();
+  Serial.print("Current state: ");
+  Serial.println(data[STATE]);
+  Serial.print("Current gps altitude: ");
+  Serial.println(data[ALTITUDE_GPS]);
+  Serial.print("Current barometer altitude: ");
+  Serial.println(data[ALTITUDE]);
+  xbee.transmit();  
 }

@@ -2,8 +2,8 @@
 #include <Arduino.h>
 
 
-XBee::XBee(void* sensors, const uint8_t num_sens_bytes) 
-        : num_sens_bytes(num_sens_bytes), timer(millis()), package_number(0), sensors((uint8_t*)sensors) {
+XBee::XBee(void* data1, const uint8_t size_data1, void* data2, const uint8_t size_data2) 
+        : timer(millis()), package_number(0),size_data1(size_data1), size_data2(size_data2), data1((uint8_t*)data1), data2((uint8_t*)data2) {
          
           //Activating serial communication
           Serial5.begin(UART_BAUDRATE);
@@ -30,7 +30,8 @@ void XBee::transmit(void) {
     if(millis()-timer > TIMER_DELAY) {
         Serial5.write('<');
         Serial5.write((uint8_t*)&(++package_number), sizeof(package_number));
-        Serial5.write(sensors, num_sens_bytes);
+        Serial5.write(data1, size_data1);
+        Serial5.write(data2, size_data2);
         Serial5.write('>');
         timer = millis();
     }
