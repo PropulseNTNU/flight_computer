@@ -5,7 +5,7 @@
 
 #define RESET_PIN 39 
 #define SLEEP_PIN 16 //Don't know what this should be yet
-#define TIMER_DELAY 10 //How often to transmit [ms]
+#define TIMER_DELAY 1000 //How often to transmit [ms]
 
 #define UART_BAUDRATE 115200
 /*
