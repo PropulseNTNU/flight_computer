@@ -137,6 +137,8 @@ void setup()
   // Initialise and hold drogue and main chute positions throughout launch
   get_servo(DROGUE_SERVO)->write(DROGUE_RESET_ANGLE);
   get_servo(MAIN_SERVO)->write(MAIN_RESET_ANGLE);
+
+
 }
 
 void loop()
@@ -149,28 +151,36 @@ void loop()
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
   data[STATE] = current_state;
-  Serial.print("state");
-  Serial.println(data[STATE]);
+
 
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
     get_IMU()->begin();
-    delay(100);
   }
-  
+
   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
       prevLogTime = millis();
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
 
-  
-  /*Serial.print("Current state: ");
+  /* Printing for Penumbra */
+  Serial.print("state");
   Serial.println(data[STATE]);
-  Serial.print("Current gps altitude: ");
-  Serial.println(data[ALTITUDE_GPS]);
-  Serial.print("Current barometer altitude: ");
-  Serial.println(data[ALTITUDE]);
-  */
+  Serial.print("t_h");
+  Serial.println(data[1],3);
+  Serial.print("t_a");
+  Serial.println(data[2],3);
+
+  if(current_state != AIRBRAKES) {
+    	Serial.print("est_h");
+	    Serial.println(0);
+      Serial.print("est_v");
+	    Serial.println(0);
+      Serial.print("c_s");
+		  Serial.println(0);
+  }
+  
+
   xbee.transmit();
 }

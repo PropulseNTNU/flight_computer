@@ -12,41 +12,56 @@ float error = 0; //error used in controller
 float riemann_sum = 0; //used in integrator, witch is used in controller
 float u = 0;
 float dt = 0; //time step used in integrator and kalman filter
+float simDt = 0;
+unsigned long time_new, time_old = 0; // time variable for delta time
 ControlParameters parameters = { 1 , 0.01 , 1 }; //Control parameters (Kp, Ki, Kd)
-unsigned long time_old = 0; // time variable for delta time
+
 
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
-float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
+float estimates[2]; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 0; //reference_velovity
 
+int iterations = 0;
 
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
-    
 	//Updats dt
-	float t = millis();
-	dt = (float)(t- time_old);
-	dt /= (float)1000; // converted to seconds
-	time_old = t;
-	if(dt > 0 && t > 0){
-		dt = 0.03/(t/dt);
+	time_new = micros();
+	dt = (float)(time_new - time_old);
+	dt /= (float)1000000; // converted to seconds
+	time_old = time_new;
+	
+	 if(dt > 0 && data[3] > 0){
+		simDt = 0.03/(data[3]/dt);
 		}
 	else{
-		dt = 0.01;
-		}
+		simDt = 0.01;
+	}
 
-	kalman(estimates, data[1], data[2], dt, reference_v);
+	if(iterations < 5) {
+		iterations += 1;
+	}else{
+		kalman(estimates, data[1], data[2], simDt, reference_v);
+	}
+	
+	Serial.print("est_h");
+	Serial.println(estimates[0],2);
+	Serial.print("est_v");
+	Serial.println(estimates[1],2);
 	
 	reference_v = getReferenceVelocity(estimates[0]);
-	error = estimates[1] - reference_v ;
-	u = controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
+	error = estimates[1] - reference_v;
+	u = controller(&error, &parameters, &riemann_sum, simDt); //updates controll signal
 
 	// write error and controll signal too file before if statement
 	if(u >= 0 && u <= 75) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
 		Serial.print("c_s");
-		Serial.println(u);
+		Serial.println(u,1);
+	}else{
+		Serial.print("c_s");
+		Serial.println(75);
 	}
 
     // This updates the ApogeeArray with current altitude
@@ -62,14 +77,17 @@ int airbrakes_state(double data[]) {
 		write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
 	}
 
+	delay(10);
+
     // Directly checks if average altitude falls below max altitude by a margin
-	if (apogeeDetected(getApogee(), data)) {
+	if (apogeeDetected(getApogee(), data) && data[0] > 10) {
 		get_servo(AIRBRAKES_SERVO)->write(0); 
 		ret_code = NEXT;
 	}
 	else {
 		ret_code = REPEAT;
 	}
+
 
 	return ret_code;
 }
