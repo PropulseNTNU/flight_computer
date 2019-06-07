@@ -23,18 +23,21 @@ float reference_v= 0; //reference_velovity
 int airbrakes_state(double data[]) {
 	return_code ret_code;
     
-	//Updats dt
+	//Update dt
 	dt = (float)(data[TIMESTAMP] - time_old);
 	dt /= (float)1000; // converted to seconds
 	time_old = data[TIMESTAMP];
 
+	//estimate the velocity and altitude using a kalman filter with accelleration and altitude as input
 	kalman(estimates, data[ALTITUDE], data[ACC_Y], dt, reference_v);
-	
+	// calculate the reference velocity we should have at the given altitude.
 	reference_v = getReferenceVelocity(estimates[0]);
+	// get the error which is how far the rockets velocity is from the optimal velocity
 	error = estimates[1] - reference_v ;
+	// calculate the servo control signal using the error
 	u = controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
 
-	// write error and controll signal too file before if statement
+	// if the controll signal is within our limit we set the servo position
 	if(u >= 0 && u <= 75) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
 	}
@@ -53,7 +56,7 @@ int airbrakes_state(double data[]) {
 	}
 
     // Directly checks if average altitude falls below max altitude by a margin
-	if (apogeeDetected(getApogee(), data)) {
+	if (apogeeDetected(getApogee(), data) && estimates[0] != 0 && estimates[1] =! 0) {
 		get_servo(AIRBRAKES_SERVO)->write(0); 
 		ret_code = NEXT;
 	}
