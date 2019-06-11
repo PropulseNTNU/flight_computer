@@ -10,38 +10,36 @@
 //initilises variables
 float error = 0; //error used in controller
 float riemann_sum = 0; //used in integrator, witch is used in controller
-float u = 0;
+float u = 0; //control signal used to control the airbrakes servo
 float dt = 0; //time step used in integrator and kalman filter
 float simDt = 0;
 unsigned long time_new, time_old = 0; // time variable for delta time
 ControlParameters parameters = { 1 , 0.01 , 1 }; //Control parameters (Kp, Ki, Kd)
 
-
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
-float estimates[2]; //Estimates from Kalman filter. [height, velocity]
+float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 0; //reference_velovity
 
-int iterations = 0;
-
+bool firstIter = true;
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
+
 	//Updats dt
 	time_new = micros();
 	dt = (float)(time_new - time_old);
 	dt /= (float)1000000; // converted to seconds
 	time_old = time_new;
-	
-	 if(dt > 0 && data[3] > 0){
-		simDt = 0.03/(data[3]/dt);
-		}
-	else{
-		simDt = 0.01;
-	}
+	simDt = (simDt + (0.03/(data[3]/dt)))/2.0f;
 
-	if(iterations < 5) {
-		iterations += 1;
-	}else{
+	Serial.print("simdt");
+	Serial.println(simDt, 5);
+
+	if(firstIter){
+		simDt = 0.00014;
+		firstIter = false;
+	}
+	else{
 		kalman(estimates, data[1], data[2], simDt, reference_v);
 	}
 	
@@ -65,7 +63,7 @@ int airbrakes_state(double data[]) {
 	}
 
     // This updates the ApogeeArray with current altitude
-    getAltitudeStruct()->updateDataArray(getAltitudeStruct(), (double)estimates[0]); //kalman_altitude == estimates[0]
+   	getAltitudeStruct()->updateDataArray(getAltitudeStruct(), (double)estimates[0]); //kalman_altitude == estimates[0]
 	
 	// write values from both airbrakes and recovery to SD card
 	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
@@ -76,18 +74,15 @@ int airbrakes_state(double data[]) {
         // writing recovery values
 		write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
 	}
-
-	delay(10);
-
+	
     // Directly checks if average altitude falls below max altitude by a margin
-	if (apogeeDetected(getApogee(), data) && data[0] > 10) {
+	if (apogeeDetected(getApogee(), data) && estimates[0] > 1600) {
 		get_servo(AIRBRAKES_SERVO)->write(0); 
 		ret_code = NEXT;
 	}
-	else {
+	else{
 		ret_code = REPEAT;
 	}
-
 
 	return ret_code;
 }

@@ -6,7 +6,7 @@ using namespace std;
 void updateArray(double* altitudes, double input_altitude) {
     double temp;
     if (isnan(input_altitude)) {
-            input_altitude = altitudes[0];
+        input_altitude = altitudes[0];
     }
     for (int i = 0; i < ARRAY_LEN; i++) {
         temp = altitudes[i];
@@ -21,7 +21,7 @@ void updateApogeeData(double* apogeeDataArray, double* altitudes) {
     for (int i = 0; i < ARRAY_LEN; i++) {
         sumAlt += altitudes[i];
     }
-    apogeeDataArray[AVERAGE_ALTITUDE] = sumAlt/ARRAY_LEN;
+    apogeeDataArray[AVERAGE_ALTITUDE] = sumAlt/(double)ARRAY_LEN;
     if (apogeeDataArray[AVERAGE_ALTITUDE] > apogeeDataArray[MAX_ALTITUDE]) {
         apogeeDataArray[MAX_ALTITUDE] = apogeeDataArray[AVERAGE_ALTITUDE];
     }

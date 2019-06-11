@@ -30,7 +30,7 @@ const uint8_t SD_CS_pin = BUILTIN_SDCARD;
     Specify the start and end state here, modify the START_STATE
     to the state function you would like to test.
 */
-#define START_STATE IDLE
+#define START_STATE ARMED
 #define END_STATE LANDED
 
 /*
@@ -163,9 +163,10 @@ void setup()
 
 void loop()
 { 
-  readSensors(data);
-  //updateSensorData(data);
+  //readSensors(data);
+  updateSensorData(data);
   
+  /*
   //bluetooth
   updateDataFromBle(payloadData);
   //for testing bluetooth data
@@ -175,7 +176,8 @@ void loop()
   }
   Serial.println("Data end recieved:");
   //test end
-  
+  */
+
   
   //Running the state machine
   state_function = state_funcs[current_state];
@@ -211,6 +213,8 @@ void loop()
 	    Serial.println(0);
       Serial.print("c_s");
 		  Serial.println(0);
+      Serial.print("simdt");
+	    Serial.println(0);
   }
   
   Serial.print("Current state: ");
