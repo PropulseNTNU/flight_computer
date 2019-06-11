@@ -140,8 +140,7 @@ void setup()
 
 void loop()
 { 
-  //readSensors(data);
-  data[TIMESTAMP] = millis();
+  readSensors(data);
   
   //Running the state machine
   state_function = state_funcs[current_state];
