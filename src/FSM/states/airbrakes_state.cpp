@@ -18,18 +18,25 @@ unsigned long time_old = 0; // time variable for delta time
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
 float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 0; //reference_velovity
+bool firstIter = true; // a boolean value so we know if we are in the first iteration. Used for handeling dt the first iteration. 
 
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
     
-	//Update dt
 	dt = (float)(data[TIMESTAMP] - time_old);
 	dt /= (float)1000; // converted to seconds
-	time_old = data[TIMESTAMP];
+	time_old = data[TIMESTAMP];;
 
-	//estimate the velocity and altitude using a kalman filter with accelleration and altitude as input
-	kalman(estimates, data[ALTITUDE], data[ACC_Y], dt, reference_v);
+	if(firstIter){
+		dt = 0.00014;
+		firstIter = false;
+	}
+	else{
+		//estimate the velocity and altitude using a kalman filter with accelleration and altitude as input
+		kalman(estimates, data[1], data[2], dt, reference_v);
+	}
+
 	// calculate the reference velocity we should have at the given altitude.
 	reference_v = getReferenceVelocity(estimates[0]);
 	// get the error which is how far the rockets velocity is from the optimal velocity
@@ -55,8 +62,8 @@ int airbrakes_state(double data[]) {
 		write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
 	}
 
-    // Directly checks if average altitude falls below max altitude by a margin
-	if (apogeeDetected(getApogee(), data) && estimates[0] != 0 && estimates[1] =! 0) {
+    // Directly checks if average altitude falls below max altitude by a margin. 
+	if (apogeeDetected(getApogee(), data) && estimates[0] > 2000) {
 		get_servo(AIRBRAKES_SERVO)->write(0); 
 		ret_code = NEXT;
 	}
