@@ -3,6 +3,7 @@
 #include "../utilities/recovery/recovery.h"
 #include "../../SD_interface/SD_interface.h"
 #include <Arduino.h>
+#include "../../sensor_interface/sensor_interface.h"
 
 /*
 
@@ -21,6 +22,7 @@ int apogee_state(double data[]) {
     
     // Transitions to next state once drogue is deployed
     if (getParachute()->drogueDeployed) {
+        get_GPS()->start();
         ret_code = NEXT;
     } else {
         ret_code = REPEAT;

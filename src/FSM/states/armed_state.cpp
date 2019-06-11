@@ -1,4 +1,5 @@
 #include "../states.h"
+#include "../../sensor_interface/sensor_interface.h"
 
 void runEntry();
 bool entry_ran = false;
@@ -15,6 +16,7 @@ int armed_state(double data[]) {
 
 
 	if (data[LINEAR_ACCEL_Y] > 15.0) {
+		get_GPS()->stop();
 		ret_code = NEXT;
 	}
 	else {
