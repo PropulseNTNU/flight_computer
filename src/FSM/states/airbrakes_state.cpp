@@ -18,15 +18,14 @@ unsigned long time_old = 0; // time variable for delta time
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
 float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 0; //reference_velovity
-bool firstIter = true; // a boolean value so we know if we are in the first iteration. Used for handeling dt the first iteration. 
-
+bool firstIter = true; // a boolean value so we know if we are in the first iteration. Used for handeling dt the first iteration.
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
     
 	dt = (float)(data[TIMESTAMP] - time_old);
 	dt /= (float)1000; // converted to seconds
-	time_old = data[TIMESTAMP];;
+	time_old = data[TIMESTAMP];
 
 	if(firstIter){
 		dt = 0.00014;
