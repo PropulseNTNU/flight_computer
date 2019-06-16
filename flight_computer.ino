@@ -1,13 +1,3 @@
-/*
-  This arduino program is currently doing the following:
-    1. Initializing sensor objects and log file.
-    2. Setting up serial and i2c communication with sensors and SD card.
-    3. Setting up the BME280 altitude sensor.
-    4. Setting up the BNO055 IMU sensor.
-    5. Reading and logging the sensor data to the text file on the SD Card.
-    6. Running the Finite State Machine.
-*/
-
 #include <Wire.h>
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
@@ -93,7 +83,7 @@ void setup()
   
   //Setup SD-card module
   if (!SD.begin(SD_CS_pin)) {
-    Serial.println("initialization failed!");
+    Serial.println("initialization of SD card failed!");
     delay(1000);
   }
   else {
@@ -104,7 +94,7 @@ void setup()
       Serial.println("Successfully opened file(s) on SD card");
     }
     else{
-      Serial.println("Successfully opened file on SD card");
+      Serial.println("Some files not initialized, please check.");
     }
     
     delay(2000); 
