@@ -8,7 +8,7 @@
  * of 'sensorData'. Add/change all the parameter but keep ''NUMBER_OF_SENSORS'
  * at the very end always.   
  * 
- * Currently 13 sensor readings
+ * Currently 15 sensor readings
 */
 enum sensorDataBle { TIME, TROLL, TPITCH, TYAW, 
                  TACCELERATION_X, TACCELERATION_Y, TACCELERATION_Z,
