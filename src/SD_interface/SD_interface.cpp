@@ -1,9 +1,25 @@
 #include "SD_interface.h"
+#include <TimeLib.h>
 
 File files[NUM_FILES];
 
-unsigned long logIntervals[NUM_INTERVALS] = {10, 10, 100, 1000};
+unsigned long logIntervals[NUM_INTERVALS] = {10, 10, 10, 100};
 unsigned long lastLog[NUM_LASTLOGS];
+
+time_t getTeensy3Time()
+{
+  return Teensy3Clock.get();
+}
+
+void dateTime(uint16_t* date, uint16_t* time) {
+  setSyncProvider(getTeensy3Time);
+
+  // return date using FAT_DATE macro to format fields
+  *date = FAT_DATE(year(), month(), day());
+
+  // return time using FAT_TIME macro to format fields
+  *time = FAT_TIME(hour(), minute(), second());
+}
 
 String createDataString(double* data, int len){
   String dataString = "";
@@ -26,14 +42,15 @@ void write_SD(int file, double* data, int len) {
 }
 
 bool init_SD(int file, const char* fileName){
-  files[file] = SD.open(fileName, O_CREAT | O_WRITE);
+  SdFile::dateTimeCallback(dateTime);
+  files[file] = SD.open(fileName, FILE_WRITE);
   if(files[file]){
     return true;
   }
   return false;
 }
 
-void close_SD() {
+void closeAll_SD() {
   for(int i = 0; i < NUM_FILES; i++){
     files[i].close();
   }

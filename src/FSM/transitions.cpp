@@ -25,13 +25,9 @@ struct transition state_transitions[] = {
 	{	LANDED,			REPEAT,			LANDED		}
 };
 
-/*
-	
-*/
 state lookup_transition(state current_state, return_code rc) {
 	state next_state = current_state;
 
-	//Lag matrise her, siden det er enums!
 	for (auto transition : state_transitions) {
 		if ((transition.source_state == current_state) && (transition.ret_code == rc)) {
 			next_state = transition.destination_state;

@@ -1,13 +1,3 @@
-/*
-  This arduino program is currently doing the following:
-    1. Initializing sensor objects and log file.
-    2. Setting up serial and i2c communication with sensors and SD card.
-    3. Setting up the BME280 altitude sensor.
-    4. Setting up the BNO055 IMU sensor.
-    5. Reading and logging the sensor data to the text file on the SD Card.
-    6. Running the Finite State Machine.
-*/
-
 #include <Wire.h>
 #include "src/FSM/states.h"
 #include "src/FSM/transitions.h"
@@ -49,9 +39,9 @@ return_code ret_code = REPEAT;
     Initialization of the data file names.
     IMPORTANT!!!: If the names are too long you will fail to write to the file.......(use short file names)
  */
-const String dataFileName = "DataFile.txt";
-const String airbrakesFileName = "AbFile.txt";
-const String recoveryFileName = "RecFile.txt";
+String dataFileName = "Data.txt";
+String airbrakesFileName = "Ab.txt";
+String recoveryFileName = "Rec.txt";
 
 unsigned long logEveryKMsec = 10;
 unsigned long prevLogTime; 
@@ -100,24 +90,32 @@ void setup()
   }
   delay(200);
   
-  //Setup SD-card module
+    //Setup SD-card module
   if (!SD.begin(SD_CS_pin)) {
-    Serial.println("initialization failed!");
-    delay(1000);
+    Serial.println("SD initialization failed!");
   }
   else {
-    delay(1000);
-    if(init_SD(DATA_FILE, dataFileName.c_str()) 
-      && init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str()) 
-      && init_SD(RECOVERY_FILE, recoveryFileName.c_str())) {
-      Serial.println("Successfully opened file(s) on SD card");
-    }
-    else{
-      Serial.println("Successfully opened file on SD card");
-    }
-    
-    delay(2000); 
+      uint8_t fileNumber = 0;
+      while (SD.exists(recoveryFileName.c_str()) &&
+             SD.exists(airbrakesFileName.c_str()) &&
+             SD.exists(dataFileName.c_str())){
+            dataFileName = "Data"+ String(fileNumber) + ".txt";
+            recoveryFileName = "Rec"+ String(fileNumber) + ".txt";
+            airbrakesFileName = "Ab"+ String(fileNumber) + ".txt";
+            fileNumber += 1;
+      }
+      
+      if(init_SD(DATA_FILE, dataFileName.c_str()) &&
+         init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str()) && 
+         init_SD(RECOVERY_FILE, recoveryFileName.c_str())) 
+        {
+          Serial.println("Successfully opened file(s) on SD card");
+        }
+      else{
+          Serial.println("Failed to opened file(s) on SD card");
+      }
   }
+  delay(1000);
 
   //Calibrate BME pressure sensor to read 0m altitude at current location
   calibrateAGL();
@@ -136,68 +134,26 @@ void setup()
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
 
-  //Delete file?
-  Serial.println("Commands: \n 'd': delete data log \n 'a': delete airbrakes log \n 'r': delete recovery log \n 'e': delete every log \n 'k': to continue");
-
-  const unsigned long startedWaiting = millis();
-  const unsigned long waitNMillis = 10000;
-
-  //Option to remove file using serial for waitNMillis milliseconds
-  while(millis() - startedWaiting <= waitNMillis){
-    String answer;
-    //since serial read only reads one byte at a time we can't use codes longer than one letter
-    //look into using readline in the future.
-    answer = Serial.read(); 
-    if (answer == "d"){
-      SD.remove(dataFileName.c_str());
-      delay(10);
-      init_SD(DATA_FILE, dataFileName.c_str());
-      Serial.print("Deleted data file.");
-      break;
-    }
-    else if (answer == "a") {
-      SD.remove(airbrakesFileName.c_str());
-      delay(10);
-      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
-      Serial.print("Deleted airbrakes file.");
-      break;
-    }
-    else if (answer == "r"){
-      SD.remove(recoveryFileName.c_str());
-      delay(10);
-      init_SD(RECOVERY_FILE, recoveryFileName.c_str());
-      Serial.print("Deleted recovery file.");
-      break;
-    }
-    else if (answer == "e") {
-      SD.remove(dataFileName.c_str());
-      delay(10);
-      init_SD(DATA_FILE, dataFileName.c_str());
-      delay(10);
-      SD.remove(airbrakesFileName.c_str());
-      delay(10);
-      init_SD(AIRBRAKES_FILE, airbrakesFileName.c_str());
-      SD.remove(recoveryFileName.c_str());
-      delay(10);
-      init_SD(RECOVERY_FILE, recoveryFileName.c_str());
-      Serial.print("Deleted every file.");
-      break;
-    }
-    else if (answer == "k") {
-      break;
-    }
-  }
-  Serial.println("Continuing..");
-
   //Setup done -> lights diode on teensy
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, HIGH);
+
 
   // init servos
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN);
   init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN);
   init_servo(MAIN_SERVO, MAIN_SERVO_PIN);
   
+
+  // Initialise servos
+  init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN, 800, 2200);
+  init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 );
+  init_servo(MAIN_SERVO, MAIN_SERVO_PIN, 800, 2200);
+
+  // Initialise and hold drogue and main chute positions throughout launch
+  get_servo(DROGUE_SERVO)->write(DROGUE_RESET_ANGLE);
+  get_servo(MAIN_SERVO)->write(MAIN_RESET_ANGLE);
+
 }
 
 void loop()
@@ -233,9 +189,15 @@ void loop()
   }
   Serial.print("Current state: ");
   Serial.println(data[STATE]);
-  Serial.print("Current gps altitude: ");
+  /*Serial.print("Current gps altitude: ");
   Serial.println(data[ALTITUDE_GPS]);
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
+
   xbee.transmit();  
 }
+
+  */
+  xbee.transmit();
+}
+

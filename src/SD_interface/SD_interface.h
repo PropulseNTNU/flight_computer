@@ -21,7 +21,7 @@ void write_SD(int file, double* data, int len);
 
 bool init_SD(int file, const char* fileName);
 
-void close_SD();
+void closeAll_SD();
 
 unsigned long* getLogInterval(int interval);
 unsigned long* getLastLog(int lastLogType);

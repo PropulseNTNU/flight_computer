@@ -8,8 +8,4 @@
 
 int chute_state(double data[]);
 
-#ifndef MainServoEndAlt
-#define MainServoEndAlt 257
-#endif
-
 #endif
