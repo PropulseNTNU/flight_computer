@@ -11,10 +11,10 @@ int armed_state(double data[]) {
 		entry_ran = true;
 	}
 
-	Serial.println("Waiting for y-accel input: must be larger than 15");
+	Serial.println("Waiting for x-accel input: must be larger than 15");
 
 
-	if (data[LINEAR_ACCEL_Y] > 15.0) {
+	if (data[LINEAR_ACCEL_X] > 15.0) {
 		ret_code = NEXT;
 	}
 	else {
