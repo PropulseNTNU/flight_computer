@@ -45,10 +45,12 @@ unsigned long prevLogTime;
 
 
 //Init data array
+const int XBEE_DATA_SIZE = 9;
+float xbee_data[XBEE_DATA_SIZE];
 double data[NUM_TYPES];
 
 //Init xbee
-XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
+XBee xbee((void*) xbee_data, XBEE_DATA_SIZE * sizeof(data[0]));
 
 void setup()
 {
@@ -130,13 +132,14 @@ void setup()
 
 void loop()
 { 
-  readSensors(data);
+  readSensors(data, xbee_data);
   
   //Running the state machine
   state_function = state_funcs[current_state];
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
   data[STATE] = current_state;
+  xbee_data[6] = float(data[STATE]);
 
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
