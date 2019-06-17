@@ -137,14 +137,7 @@ void setup()
   //Setup done -> lights diode on teensy
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, HIGH);
-
-
-  // init servos
-  init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN);
-  init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN);
-  init_servo(MAIN_SERVO, MAIN_SERVO_PIN);
   
-
   // Initialise servos
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN, 800, 2200);
   init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 );
@@ -159,7 +152,7 @@ void setup()
 void loop()
 { 
   readSensors(data);
-  
+  Serial.println("Bluetooth start");
   //bluetooth
   updateDataFromBle(payloadData);
   //for testing bluetooth data
@@ -169,7 +162,7 @@ void loop()
   }
   Serial.println("Data end recieved:");
   //test end
-  
+  Serial.println("Bluetooth end");
   
   //Running the state machine
   state_function = state_funcs[current_state];
@@ -200,4 +193,3 @@ void loop()
   */
   xbee.transmit();
 }
-

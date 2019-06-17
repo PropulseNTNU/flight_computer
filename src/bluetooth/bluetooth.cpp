@@ -38,7 +38,7 @@ char* retriveMessageBle(){
     conn.stopListening();
     return buf;     
   }
-  delay(200);
+  //delay(200);
   //free(receivedMessage);
   return 0;
 }
@@ -71,7 +71,7 @@ int messageFromPayload(double* data){
     return 1;
   }
       
-  delay(200);
+  //delay(200);
   return 0;
 }
 
