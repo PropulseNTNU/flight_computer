@@ -191,9 +191,9 @@ void loop()
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
 
-  /*Serial.print("Current state: ");
+  Serial.print("Current state: ");
   Serial.println(data[STATE]);
-  Serial.print("Current gps altitude: ");
+  /*Serial.print("Current gps altitude: ");
   Serial.println(data[ALTITUDE_GPS]);
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
