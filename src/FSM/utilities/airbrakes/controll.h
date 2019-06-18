@@ -11,6 +11,6 @@ typedef struct Parameters_t {
 
 float controller(float* error, ControlParameters* parameters, float* riemann_sum, float dt);
 float integrate(float prev_sum, float value, float step);
-
+float test_calculate_area(float u);
 
 #endif

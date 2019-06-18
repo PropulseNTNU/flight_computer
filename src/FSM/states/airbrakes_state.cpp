@@ -21,6 +21,7 @@ float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 0; //reference_velovity
 
 bool firstIter = true;
+const int degrees_rotation = 30;
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
@@ -50,16 +51,25 @@ int airbrakes_state(double data[]) {
 	
 	reference_v = getReferenceVelocity(estimates[0]);
 	error = estimates[1] - reference_v;
-	u = controller(&error, &parameters, &riemann_sum, simDt); //updates controll signal
+	u = degrees_rotation + controller(&error, &parameters, &riemann_sum, simDt); //updates controll signal
 
 	// write error and controll signal too file before if statement
-	if(u >= 0 && u <= 75) {
+	if(u > 60) {
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
 		Serial.print("c_s");
-		Serial.println(u,1);
-	}else{
+		Serial.println(test_calculate_area(60), 5);
+	}
+	else if(u < 0) {
+		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
 		Serial.print("c_s");
-		Serial.println(75);
+		Serial.println(test_calculate_area(0), 5);
+	}
+	else{
+		
+		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
+		Serial.print("c_s");
+		Serial.println(test_calculate_area(u), 5);
+	
 	}
 
     // This updates the ApogeeArray with current altitude
@@ -76,7 +86,7 @@ int airbrakes_state(double data[]) {
 	}
 	
     // Directly checks if average altitude falls below max altitude by a margin
-	if (apogeeDetected(getApogee(), data) && estimates[0] > 1600) {
+	if (apogeeDetected(getApogee(), data) && estimates[0] > 2000) {
 		get_servo(AIRBRAKES_SERVO)->write(0); 
 		ret_code = NEXT;
 	}
