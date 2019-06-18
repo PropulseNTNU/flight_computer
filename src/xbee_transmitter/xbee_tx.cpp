@@ -30,7 +30,7 @@ void XBee::transmit(void) {
    if(millis()-timer > TIMER_DELAY) {   
        Serial5.write('<');
        Serial5.write((uint8_t*)&(++package_number), sizeof(package_number));
-       Serial5.write((uint8_t*)(data), num_sens_bytes/sizeof(double)*sizeof(float));
+       Serial5.write((uint8_t*)(sensors), num_sens_bytes/sizeof(double)*sizeof(float));
        Serial5.write('>');
        timer = millis();
    }
