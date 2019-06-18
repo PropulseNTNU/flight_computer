@@ -5,6 +5,9 @@
 #include "src/servo_interface/servo_interface.h"
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
+#include "src/bluetooth/bluetooth.h"
+
+
 
 /*
     Setup of adresses
@@ -49,8 +52,18 @@ const int XBEE_DATA_SIZE = 9;
 double xbee_data[XBEE_DATA_SIZE];
 double data[NUM_TYPES];
 
+//Init bluetooth data array
+const int NUM_SENSORS = NUMBER_OF_SENSORS;
+double payloadData[NUM_SENSORS]; 
+
+
 //Init xbee
+<<<<<<< HEAD
 XBee xbee((void*) xbee_data, XBEE_DATA_SIZE * sizeof(data[0]));
+=======
+XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]), (void*) payloadData, NUM_SENSORS * sizeof(data[0]));
+
+>>>>>>> e9ed6fc6e6501c4c4908aa4aeeb2edbe551b1659
 
 void setup()
 {
@@ -113,13 +126,24 @@ void setup()
   //Calibrate BME pressure sensor to read 0m altitude at current location
   calibrateAGL();
 
+
+  //
+  Serial.println("Setup for recieving bluetooth communication");
+  if (setupBle(payloadData, NUM_SENSORS))
+  {
+    Serial.println("Bluetooth setup done");
+  }
+  else {
+    Serial.println("Bluetooth crashed");
+  } 
+
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
 
   //Setup done -> lights diode on teensy
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, HIGH);
-
+  
   // Initialise servos
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN, 800, 2200);
   init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 );
@@ -128,37 +152,57 @@ void setup()
   // Initialise and hold drogue and main chute positions throughout launch
   get_servo(DROGUE_SERVO)->write(DROGUE_RESET_ANGLE);
   get_servo(MAIN_SERVO)->write(MAIN_RESET_ANGLE);
+
 }
 
 void loop()
 { 
+<<<<<<< HEAD
   readSensors(data, xbee_data);
+=======
+  readSensors(data);
+  //bluetooth
+  updateDataFromBle(payloadData);
+  //for testing bluetooth data
+  Serial.println("Data recieved:");
+  for(int i= 0; i < NUM_SENSORS; i++){
+    Serial.println(payloadData[i]);
+  }
+  Serial.println("Data end recieved");
+  //test end
+>>>>>>> e9ed6fc6e6501c4c4908aa4aeeb2edbe551b1659
   
   //Running the state machine
   state_function = state_funcs[current_state];
+  
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
   data[STATE] = current_state;
+<<<<<<< HEAD
   xbee_data[6] = float(data[STATE]);
 
+=======
+>>>>>>> e9ed6fc6e6501c4c4908aa4aeeb2edbe551b1659
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
     get_IMU()->begin();
     delay(100);
   }
-  
-  //Starting writing to SD card when ARMED 
+   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
       prevLogTime = millis();
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
-
   Serial.print("Current state: ");
   Serial.println(data[STATE]);
   /*Serial.print("Current gps altitude: ");
   Serial.println(data[ALTITUDE_GPS]);
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
+
+  xbee.transmit();  
+}
+
   */
   xbee.transmit();
 }
