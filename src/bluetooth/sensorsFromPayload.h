@@ -18,7 +18,7 @@ enum allSensorDataBle { ATIME, AROLL, APITCH, AYAW,
 		 ATEMP_ACCUR_SENS}; 
 
 enum sensorDataBle { TIME, TROLL, TPITCH, TYAW, 
-                 TACCELERATION_X, TALTITUDE, NUMBER_OF_SENSORS};
+                 TACCELERATION_Y, TALTITUDE, NUMBER_OF_SENSORS};
 
 
 #endif

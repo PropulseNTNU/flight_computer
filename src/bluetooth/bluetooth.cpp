@@ -95,8 +95,8 @@ int mapIDOfSensors(int id){
     case AROLL:              return TROLL;
     case APITCH:             return TPITCH;
     case AYAW:               return TYAW;
-    case AACCELERATION_X:    return TACCELERATION_X;
-    case AACCELERATION_Y:    return 20;
+    case AACCELERATION_X:    return 20;
+    case AACCELERATION_Y:    return TACCELERATION_Y;
     case AACCELERATION_Z:    return 20;
     case ACOMPASS_X:         return 20;
     case ACOMPASS_Y:         return 20;    

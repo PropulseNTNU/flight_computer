@@ -152,11 +152,13 @@ void loop()
   updateDataFromBle(payload_data);
   
   //for testing bluetooth data
+  
   Serial.println("Data recieved:");
   for(int i= 0; i < BT_DATA_SIZE; i++){
     Serial.println(payload_data[i]);
   }
   Serial.println("Data end recieved");
+  
   //test end
   
   // Merge bluetooth into xbee_data
