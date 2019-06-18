@@ -58,12 +58,7 @@ double payloadData[NUM_SENSORS];
 
 
 //Init xbee
-<<<<<<< HEAD
 XBee xbee((void*) xbee_data, XBEE_DATA_SIZE * sizeof(data[0]));
-=======
-XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]), (void*) payloadData, NUM_SENSORS * sizeof(data[0]));
-
->>>>>>> e9ed6fc6e6501c4c4908aa4aeeb2edbe551b1659
 
 void setup()
 {
@@ -157,10 +152,8 @@ void setup()
 
 void loop()
 { 
-<<<<<<< HEAD
   readSensors(data, xbee_data);
-=======
-  readSensors(data);
+  
   //bluetooth
   updateDataFromBle(payloadData);
   //for testing bluetooth data
@@ -170,7 +163,6 @@ void loop()
   }
   Serial.println("Data end recieved");
   //test end
->>>>>>> e9ed6fc6e6501c4c4908aa4aeeb2edbe551b1659
   
   //Running the state machine
   state_function = state_funcs[current_state];
@@ -178,11 +170,8 @@ void loop()
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
   data[STATE] = current_state;
-<<<<<<< HEAD
   xbee_data[6] = float(data[STATE]);
 
-=======
->>>>>>> e9ed6fc6e6501c4c4908aa4aeeb2edbe551b1659
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
     get_IMU()->begin();
