@@ -5,9 +5,7 @@
 #include "src/servo_interface/servo_interface.h"
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
-#include "src/bluetooth/bluetooth.h"
-
-
+// #include "src/bluetooth/bluetooth.h" IMPORTANT! Should be included with bluetooth integration
 
 /*
     Setup of adresses
@@ -44,14 +42,14 @@ String airbrakesFileName = "Ab.txt";
 String recoveryFileName = "Rec.txt";
 
 unsigned long logEveryKMsec = 10;
-unsigned long prevLogTime; 
+unsigned long prevLogTime;
 
 
 //Init data array
 const int FC_DATA_SIZE = 9;
-const int BT_DATA_SIZE = sensorDataBle::NUMBER_OF_SENSORS;
+const int BT_DATA_SIZE = 6;// SHOULD BE: "= sensorDataBle::NUMBER_OF_SENSORS;" when bluetooth is integrated
 const int XBEE_DATA_SIZE = FC_DATA_SIZE + BT_DATA_SIZE;
-double payload_data[BT_DATA_SIZE];
+double payload_data[BT_DATA_SIZE] = {1, 2, 3, 4, 5, 6}; // IMPORTANT! Only test by init. list "= {...}" should be removed
 double xbee_data[XBEE_DATA_SIZE];
 double data[NUM_TYPES];
 
@@ -122,14 +120,15 @@ void setup()
 
 
   //
+  /* IMPORTANT! Include when payload is integrated
   Serial.println("Setup for recieving bluetooth communication");
-  if (setupBle(payloadData, NUM_SENSORS))
+  if (setupBle(payload_data, BT_DATA_SIZE))
   {
     Serial.println("Bluetooth setup done");
   }
   else {
     Serial.println("Bluetooth crashed");
-  } 
+  }  */
 
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
@@ -156,8 +155,6 @@ void loop()
   //bluetooth
   //updateDataFromBle(payload_data);
   
-  payload_data = double[BT_DATA_SIZE]{}; // Test by sending only zeros
-  
   //for testing bluetooth data
   Serial.println("Data recieved:");
   for(int i= 0; i < BT_DATA_SIZE; i++){
@@ -168,7 +165,7 @@ void loop()
   
   // Merge bluetooth into xbee_data
   for (int i = FC_DATA_SIZE; i < XBEE_DATA_SIZE; i++)
-    xbee_data[i] = payload_data[i];
+    xbee_data[i] = payload_data[i-FC_DATA_SIZE];
   
 
   //Running the state machine

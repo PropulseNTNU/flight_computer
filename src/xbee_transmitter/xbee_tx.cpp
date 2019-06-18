@@ -2,8 +2,8 @@
 #include <Arduino.h>
 
 
-XBee::XBee(void* data1, const uint8_t size_data1, void* data2, const uint8_t size_data2) 
-        : timer(millis()), package_number(0),size_data1(size_data1), size_data2(size_data2), data1((uint8_t*)data1), data2((uint8_t*)data2) {
+XBee::XBee(void* sensors, const uint8_t num_sens_bytes) 
+        : num_sens_bytes(num_sens_bytes), timer(millis()), package_number(0), sensors((uint8_t*)sensors) {
          
           //Activating serial communication
           Serial5.begin(UART_BAUDRATE);
@@ -50,6 +50,3 @@ void XBee::sleep(void) {
 void XBee::wake_up(void) {
     digitalWrite(SLEEP_PIN, LOW);
 }
-
-
-

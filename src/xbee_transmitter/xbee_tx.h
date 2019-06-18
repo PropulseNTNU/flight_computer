@@ -12,9 +12,9 @@
  *  Class for transmitting and receiving data through XBee.
  *
  *  Variables:
- *      size_data1              Number of bytes in sensor array.
+ *      num_sens_bytes              Number of bytes in sensor array.
  *      package_number              Incremented for every package that is transmitted.
- *      *data1                    Pointer to array of sensor data. 
+ *      *sensors                    Pointer to array of sensor data. 
  *
  *  Important methods:
  *      XBee()                      Constructor
@@ -23,29 +23,24 @@
  */
 class XBee {
   
-    
+    uint8_t num_sens_bytes;
     unsigned long timer; 
     uint16_t package_number;
-
-    uint8_t size_data1;
-    uint8_t size_data2;
+    uint8_t *sensors;     
     
-    uint8_t *data1;     
-    uint8_t *data2;
-
 public:
    
     /*
      *   Constructor
      *   Input:
-     *       void* data           Array of sensor data. Remember to cast to (void*).
-     *       uint8_t size_data        Number of Bytes in sensor array.
+     *       void* sensors           Array of sensor data. Remember to cast to (void*).
+     *       uint8_t num_sens        Number of Bytes in sensor array.
      */
-    XBee(void* data1, const uint8_t size_data1, void* data2, const uint8_t size_data2);
+    XBee(void* sensors, const uint8_t num_sens);
 
     /* 
      *  Transmits package number and sensor data.
-     *  Format                       <[package_number][data1]> 
+     *  Format                       <[package_number][sensors]> 
      */
     void transmit(void);
 
