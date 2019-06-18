@@ -11,7 +11,7 @@
  * Currently 15 sensor readings
 */
 enum sensorDataBle { TIME, TROLL, TPITCH, TYAW, 
-                 TACCELERATION_X, TALTITUDE};
+                 TACCELERATION_X, TALTITUDE, NUMBER_OF_SENSORS};
 
 
 #endif
