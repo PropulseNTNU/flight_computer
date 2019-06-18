@@ -152,7 +152,6 @@ void setup()
 void loop()
 { 
   readSensors(data);
-  Serial.println("Bluetooth start");
   //bluetooth
   updateDataFromBle(payloadData);
   //for testing bluetooth data
@@ -160,9 +159,8 @@ void loop()
   for(int i= 0; i < NUM_SENSORS; i++){
     Serial.println(payloadData[i]);
   }
-  Serial.println("Data end recieved:");
+  Serial.println("Data end recieved");
   //test end
-  Serial.println("Bluetooth end");
   
   //Running the state machine
   state_function = state_funcs[current_state];

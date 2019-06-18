@@ -24,4 +24,6 @@ int messageFromPayload(double* data);
 
 void updateDataFromBle(double* data);
 
+int mapIDOfSensors(int id);
+
 #endif

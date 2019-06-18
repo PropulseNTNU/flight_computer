@@ -38,7 +38,6 @@ char* retriveMessageBle(){
     conn.stopListening();
     return buf;     
   }
-  //delay(200);
   //free(receivedMessage);
   return 0;
 }
@@ -54,24 +53,27 @@ int messageFromPayload(double* data){
   char* message =  (retriveMessageBle());
   int index = 0;
   index = strlen(message);
-  String messageID = ""; 
+  String messageID = "";
+  Serial.println("This msg is being handled: ");
+  Serial.println(message); 
   if(index > 2){
     uint8_t messageIDFirstDigit = uint8_t(message[index-2])- 48; //ASCII fixing
     uint8_t messageIDSecondDigit = uint8_t(message[index-1]) - 48; //ASCII fixing
     messageID = String(messageIDFirstDigit) + String(messageIDSecondDigit);
-    
+     
     if(messageIDFirstDigit == 253){ //ASCII fix removing '-'
       messageID = String(messageIDSecondDigit);
     }
     message[index -2] = '\0';
     double msg = atof(message);
     int id = messageID.toInt(); 
-        
-    data[id-1] = msg;
+    id = mapIDOfSensors(id); 
+    Serial.println("ID: ");
+    Serial.println(id);	   
+    data[id] = msg;
     return 1;
   }
       
-  //delay(200);
   return 0;
 }
 
@@ -84,5 +86,29 @@ void updateDataFromBle(double* data){
     
   //}
 
+}
+
+int mapIDOfSensors(int id){
+    id = id - 1;
+    switch(id){
+    case ATIME:              return TIME;
+    case AROLL:              return TROLL;
+    case APITCH:             return TPITCH;
+    case AYAW:               return TYAW;
+    case AACCELERATION_X:    return TACCELERATION_X;
+    case AACCELERATION_Y:    return 20;
+    case AACCELERATION_Z:    return 20;
+    case ACOMPASS_X:         return 20;
+    case ACOMPASS_Y:         return 20;    
+    case ACOMPASS_Z: 	     return 20;
+    case ATEMPERATURES:      return 20;
+    case AHUMIDITY:          return 20;
+    case AALTITUDE:          return TALTITUDE;
+    case APRESSURE:          return 20;
+    case AGAS:               return 20;
+    case ATEMP_ACCUR_SENS:   return 20;
+    
+    default:   Serial.println("Not valid!");
+    }
 }
 
