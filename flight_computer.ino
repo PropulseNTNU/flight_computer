@@ -182,16 +182,19 @@ void loop()
       prevLogTime = millis();
       write_SD(DATA_FILE, data, NUM_TYPES);
   }
+
+  //Rocket disarmed, change state to IDLE
+  if (!digitalRead(ARM_BUTTON_PIN) && current_state==ARMED){
+    current_state = IDLE;
+  }
+
   Serial.print("Current state: ");
   Serial.println(data[STATE]);
   /*Serial.print("Current gps altitude: ");
   Serial.println(data[ALTITUDE_GPS]);
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
-
-  xbee.transmit();  
-}
-
   */
+
   xbee.transmit();
 }
