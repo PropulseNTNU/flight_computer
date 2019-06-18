@@ -19,6 +19,7 @@ float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction
 float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v= 0; //reference_velovity
 bool firstIter = true; // a boolean value so we know if we are in the first iteration. Used for handeling dt the first iteration.
+const int default_rotation = 30;
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
@@ -33,7 +34,7 @@ int airbrakes_state(double data[]) {
 	}
 	else{
 		//estimate the velocity and altitude using a kalman filter with accelleration and altitude as input
-		kalman(estimates, data[1], data[2], dt, reference_v);
+		kalman(estimates, data[ALTITUDE], data[ACC_X], dt, reference_v);
 	}
 
 	// calculate the reference velocity we should have at the given altitude.
@@ -41,11 +42,23 @@ int airbrakes_state(double data[]) {
 	// get the error which is how far the rockets velocity is from the optimal velocity
 	error = estimates[1] - reference_v ;
 	// calculate the servo control signal using the error
-	u = controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
+	u = default_rotation + controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
 
-	// if the controll signal is within our limit we set the servo position
-	if(u >= 0 && u <= 75) {
+	// write error and controll signal too file before if statement
+	if(u > 60) {
+		get_servo(AIRBRAKES_SERVO)->write(60); //updates servo position
+		Serial.print("c_s");
+		Serial.println(60);
+	}
+	else if(u < 0){
+		get_servo(AIRBRAKES_SERVO)->write(0); //updates servo position
+		Serial.print("c_s");
+		Serial.println(0);
+	}
+	else{
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
+		Serial.print("c_s");
+		Serial.println(u);
 	}
 
     // This updates the ApogeeArray with current altitude
@@ -60,8 +73,8 @@ int airbrakes_state(double data[]) {
         // writing recovery values
 		write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
 	}
-
-    // Directly checks if average altitude falls below max altitude by a margin. 
+	
+    // Directly checks if average altitude falls below max altitude by a margin
 	if (apogeeDetected(getApogee(), data) && estimates[0] > 2000) {
 		get_servo(AIRBRAKES_SERVO)->write(0); 
 		ret_code = NEXT;

@@ -17,33 +17,11 @@ int burnout_state(double data[]) {
 	}
 	burntime = data[TIMESTAMP] - launchTime;
 
-	Serial.println(burntime);
-
-	//if acc_z is negative but increasing
-	if(data[ACC_X] > last_data_x && last_data_x < 0){
-		// increment the increasing count
-		increasing_count += 1;
-	}
-	last_data_x = data[ACC_X];
-
-	// if data[ACC_Z] is negative but increasing, and time is more than burntime - epsilon
-	// or time is more than burntime + epsilon which is the uppper limit.
-	/*if (((increasing_count > increasing_min_limit) && (burnout_time > (burnout_time - epsilon)))
-	   || (burntime > burnout_time + epsilon)) {
-		ret_code = NEXT;
-	}
-	else {
-		ret_code = REPEAT;
-	}
-	*/
-
-	if (burntime > (burnout_time + epsilon) && data[ACC_X] <= 0){
-		ret_code = NEXT;
-	}
-	else {
-		ret_code = REPEAT;
-	}
-
+	if((burntime > (burnout_time + epsilon) && data[ACC_X] <= 0){
+            ret_code = NEXT;
+    }else{
+            ret_code = REPEAT;
+    }
 
 	return ret_code;
 }

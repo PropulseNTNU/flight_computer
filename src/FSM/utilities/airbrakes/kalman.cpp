@@ -17,10 +17,6 @@ Matrix<2,1> K_k;
 Matrix<2,1> Z;
 Matrix<2, 2> P_k;
 
-//physical values
-float drag=1;
-float mass=21.58;
-
 
 void kalman(float* estimates, float  altitude, float acceleration, float dt, float reference_v){
   //Updating variables
