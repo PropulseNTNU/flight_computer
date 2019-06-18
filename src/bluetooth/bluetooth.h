@@ -1,6 +1,7 @@
 #ifndef BLUETOOTH_H
 #define BLUETOOTH_H
 
+#include "Arduino.h"
 #include <SPI.h>
 #include <RF24.h>
 #include "sensorsFromPayload.h"

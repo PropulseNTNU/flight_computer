@@ -48,13 +48,12 @@ unsigned long prevLogTime;
 
 
 //Init data array
-const int XBEE_DATA_SIZE = 9;
+const int FC_DATA_SIZE = 9;
+const int BT_DATA_SIZE = sensorDataBle::NUMBER_OF_SENSORS;
+const int XBEE_DATA_SIZE = FC_DATA_SIZE + BT_DATA_SIZE;
+double payload_data[BT_DATA_SIZE];
 double xbee_data[XBEE_DATA_SIZE];
 double data[NUM_TYPES];
-
-//Init bluetooth data array
-const int NUM_SENSORS = NUMBER_OF_SENSORS;
-double payloadData[NUM_SENSORS]; 
 
 
 //Init xbee
@@ -155,15 +154,23 @@ void loop()
   readSensors(data, xbee_data);
   
   //bluetooth
-  updateDataFromBle(payloadData);
+  //updateDataFromBle(payload_data);
+  
+  payload_data = double[BT_DATA_SIZE]{}; // Test by sending only zeros
+  
   //for testing bluetooth data
   Serial.println("Data recieved:");
-  for(int i= 0; i < NUM_SENSORS; i++){
-    Serial.println(payloadData[i]);
+  for(int i= 0; i < BT_DATA_SIZE; i++){
+    Serial.println(payload_data[i]);
   }
   Serial.println("Data end recieved");
   //test end
   
+  // Merge bluetooth into xbee_data
+  for (int i = FC_DATA_SIZE; i < XBEE_DATA_SIZE; i++)
+    xbee_data[i] = payload_data[i];
+  
+
   //Running the state machine
   state_function = state_funcs[current_state];
   
