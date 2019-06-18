@@ -38,7 +38,7 @@ void calibrateAGL(){
       pitch = y axis
       yaw   = z axis
 */
-void readSensors(double *data, float *xbee_data){
+void readSensors(double *data, double *xbee_data){
   //Update BMP280 sensor data
   //Important to read temperature before reading pressure
   data[BME_TEMP] = Bme.readTempC();

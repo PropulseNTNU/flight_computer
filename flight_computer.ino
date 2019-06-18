@@ -46,7 +46,7 @@ unsigned long prevLogTime;
 
 //Init data array
 const int XBEE_DATA_SIZE = 9;
-float xbee_data[XBEE_DATA_SIZE];
+double xbee_data[XBEE_DATA_SIZE];
 double data[NUM_TYPES];
 
 //Init xbee

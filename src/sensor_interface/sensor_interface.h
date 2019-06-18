@@ -21,7 +21,7 @@ const uint8_t IMU_ADDRESS = 0x28;
       pitch = y axis
       yaw   = z axis
 */
-void readSensors(double *data, float *xbee_data);
+void readSensors(double *data, double *xbee_data);
 
 //Calibrate BME pressure sensor to read 0m altitude at current location.
 //NB: Important to read temperature before reading pressure.
