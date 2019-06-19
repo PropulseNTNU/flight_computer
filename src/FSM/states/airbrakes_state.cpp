@@ -17,7 +17,7 @@ unsigned long time_old = 0; // time variable for delta time
 
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
 float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
-float reference_v= 0; //reference_velovity
+float reference_v = 0; //reference_velovity
 bool firstIter = true; // a boolean value so we know if we are in the first iteration. Used for handeling dt the first iteration.
 const int default_rotation = 30;
 
@@ -40,7 +40,7 @@ int airbrakes_state(double data[]) {
 	// calculate the reference velocity we should have at the given altitude.
 	reference_v = getReferenceVelocity(estimates[0]);
 	// get the error which is how far the rockets velocity is from the optimal velocity
-	error = estimates[1] - reference_v ;
+	error = estimates[1] - reference_v;
 	// calculate the servo control signal using the error
 	u = default_rotation + controller(&error, &parameters, &riemann_sum, dt); //updates controll signal
 

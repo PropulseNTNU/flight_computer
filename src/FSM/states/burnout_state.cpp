@@ -8,20 +8,20 @@ const int burnout_time = 7000; // Milliseconds the rough estimate of how long th
 const int epsilon = 500; // a small time constatnt used for max and min deviation from burnout_time
 double launchTime = 0; // the time at launch(motor start)
 
-int burnout_state(double data[]) {
+int burnout_state(double data[]){
 	return_code ret_code;
 
 	//get the time at launch so we can estimate burnout time
-	if(launchTime == 0){
+	if (launchTime == 0) {
 		launchTime = data[TIMESTAMP];
 	}
 	burntime = data[TIMESTAMP] - launchTime;
 
-	if((burntime > (burnout_time + epsilon) && data[ACC_X] <= 0){
-            ret_code = NEXT;
-    }else{
-            ret_code = REPEAT;
-    }
+	if((burntime > (burnout_time + epsilon)) && data[ACC_X] <= 0){
+		ret_code = NEXT;
+	}else{
+		ret_code = REPEAT;
+	}
 
 	return ret_code;
 }
