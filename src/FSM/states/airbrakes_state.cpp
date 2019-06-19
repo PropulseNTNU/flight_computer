@@ -47,18 +47,12 @@ int airbrakes_state(double data[]) {
 	// write error and controll signal too file before if statement
 	if(u > 60) {
 		get_servo(AIRBRAKES_SERVO)->write(60); //updates servo position
-		Serial.print("c_s");
-		Serial.println(60);
 	}
 	else if(u < 0){
 		get_servo(AIRBRAKES_SERVO)->write(0); //updates servo position
-		Serial.print("c_s");
-		Serial.println(0);
 	}
 	else{
 		get_servo(AIRBRAKES_SERVO)->write(u); //updates servo position
-		Serial.print("c_s");
-		Serial.println(u);
 	}
 
     // This updates the ApogeeArray with current altitude
