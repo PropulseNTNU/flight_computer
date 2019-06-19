@@ -8,42 +8,20 @@ const int burnout_time = 7000; // Milliseconds the rough estimate of how long th
 const int epsilon = 500; // a small time constatnt used for max and min deviation from burnout_time
 double launchTime = 0; // the time at launch(motor start)
 
-int burnout_state(double data[]) {
+int burnout_state(double data[]){
 	return_code ret_code;
 
 	//get the time at launch so we can estimate burnout time
-	if(launchTime == 0){
+	if (launchTime == 0) {
 		launchTime = data[TIMESTAMP];
 	}
 	burntime = data[TIMESTAMP] - launchTime;
 
-	Serial.println(burntime);
-
-	//if acc_z is negative but increasing
-	if(data[ACC_X] > last_data_x && last_data_x < 0){
-		// increment the increasing count
-		increasing_count += 1;
-	}
-	last_data_x = data[ACC_X];
-
-	// if data[ACC_Z] is negative but increasing, and time is more than burntime - epsilon
-	// or time is more than burntime + epsilon which is the uppper limit.
-	/*if (((increasing_count > increasing_min_limit) && (burnout_time > (burnout_time - epsilon)))
-	   || (burntime > burnout_time + epsilon)) {
+	if((burntime > (burnout_time + epsilon)) && data[ACC_X] <= 0){
 		ret_code = NEXT;
-	}
-	else {
+	}else{
 		ret_code = REPEAT;
 	}
-	*/
-
-	if (burntime > (burnout_time + epsilon) && data[ACC_X] <= 0){
-		ret_code = NEXT;
-	}
-	else {
-		ret_code = REPEAT;
-	}
-
 
 	return ret_code;
 }
