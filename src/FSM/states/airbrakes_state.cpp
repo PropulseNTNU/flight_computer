@@ -20,6 +20,7 @@ float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v = 0; //reference_velovity
 bool firstIter = true; // a boolean value so we know if we are in the first iteration. Used for handeling dt the first iteration.
 const int default_rotation = 30;
+double abValues[4] = {0,0,0,0};
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
@@ -62,7 +63,10 @@ int airbrakes_state(double data[]) {
 	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
 		setLastLog(millis(), COMMON_LASTLOG);
 		// these values may be nan during testing since the lookup table or sensors may be missing
-		double abValues[4] = {data[TIMESTAMP], estimates[0], estimates[1], u};
+		abValues[0] = data[TIMESTAMP];
+		abValues[1] = estimates[0];
+		abValues[2] = estimates[1];
+		abValues[3] = u;
 		write_SD(AIRBRAKES_FILE, abValues, 4);
         // writing recovery values
 		write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);

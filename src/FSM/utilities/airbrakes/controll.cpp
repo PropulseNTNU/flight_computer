@@ -5,7 +5,7 @@ float integrate(float prev_sum, float value, float step){
 }
 
 float pros_to_deg(float prosent){
-  return asin(prosent/100) * 180.0/PI;
+  return asin(prosent/100.0) * 180.0/M_PI;
 }
 
 float controller(float* error, ControlParameters* parameters, float* riemann_sum, float dt){ //PI-controller
