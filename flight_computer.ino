@@ -152,19 +152,17 @@ void loop()
   updateDataFromBle(payload_data);
   
   //for testing bluetooth data
-  
   Serial.println("Data recieved:");
   for(int i= 0; i < BT_DATA_SIZE; i++){
     Serial.println(payload_data[i]);
   }
   Serial.println("Data end recieved");
-  
   //test end
   
   // Merge bluetooth into xbee_data
-  for (int i = FC_DATA_SIZE; i < XBEE_DATA_SIZE; i++)
+  for (int i = FC_DATA_SIZE; i < XBEE_DATA_SIZE; i++){
     xbee_data[i] = payload_data[i-FC_DATA_SIZE];
-  
+    }
 
   //Running the state machine
   state_function = state_funcs[current_state];
