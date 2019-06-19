@@ -1,6 +1,8 @@
 #ifndef AIRBRAKES_CONTROLL_H
 #define AIRBRAKES_CONTROLL_H
 
+#define M_PI 3.14159265358979323846 
+
 //structs
 typedef struct Parameters_t {
   float kpp;
