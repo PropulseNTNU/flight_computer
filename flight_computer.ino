@@ -5,6 +5,7 @@
 #include "src/servo_interface/servo_interface.h"
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
+#include "src/bluetooth/bluetooth.h"
 
 /*
     Setup of adresses
@@ -41,14 +42,20 @@ String airbrakesFileName = "Ab.txt";
 String recoveryFileName = "Rec.txt";
 
 unsigned long logEveryKMsec = 10;
-unsigned long prevLogTime; 
+unsigned long prevLogTime;
 
 
 //Init data array
+const int FC_DATA_SIZE = 9;
+const int BT_DATA_SIZE = NUMBER_OF_SENSORS;
+const int XBEE_DATA_SIZE = FC_DATA_SIZE + BT_DATA_SIZE;
+double payload_data[BT_DATA_SIZE];
+double xbee_data[XBEE_DATA_SIZE];
 double data[NUM_TYPES];
 
+
 //Init xbee
-XBee xbee((void*) data, NUM_TYPES * sizeof(data[0]));
+XBee xbee((void*) xbee_data, XBEE_DATA_SIZE * sizeof(data[0]));
 
 void setup()
 {
@@ -111,13 +118,22 @@ void setup()
   //Calibrate BME pressure sensor to read 0m altitude at current location
   calibrateAGL();
 
+  Serial.println("Setup for recieving bluetooth communication");
+  if (setupBle(payload_data, BT_DATA_SIZE))
+  {
+    Serial.println("Bluetooth setup done");
+  }
+  else {
+    Serial.println("Bluetooth crashed");
+  }
+
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
 
   //Setup done -> lights diode on teensy
   pinMode(LED_pin, OUTPUT);
   digitalWrite(LED_pin, HIGH);
-
+  
   // Initialise servos
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN, 800, 2200);
   init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 );
@@ -126,28 +142,50 @@ void setup()
   // Initialise and hold drogue and main chute positions throughout launch
   get_servo(DROGUE_SERVO)->write(DROGUE_RESET_ANGLE);
   get_servo(MAIN_SERVO)->write(MAIN_RESET_ANGLE);
+
 }
 
 void loop()
 { 
-  readSensors(data);
+  readSensors(data, xbee_data);
   
+  updateDataFromBle(payload_data);
+  
+  //for testing bluetooth data
+  Serial.println("Data recieved:");
+  for(int i= 0; i < BT_DATA_SIZE; i++){
+    Serial.println(payload_data[i]);
+  }
+  Serial.println("Data end recieved");
+  //test end
+  
+  // Merge bluetooth into xbee_data
+  for (int i = FC_DATA_SIZE; i < XBEE_DATA_SIZE; i++){
+    xbee_data[i] = payload_data[i-FC_DATA_SIZE];
+    }
+
   //Running the state machine
   state_function = state_funcs[current_state];
+  
   ret_code = return_code(state_function(data));
   current_state = lookup_transition(current_state, ret_code);
   data[STATE] = current_state;
+  xbee_data[6] = float(data[STATE]);
 
   //Reset IMU when transitioning to ARMED state
   if(ret_code == NEXT && current_state==ARMED){
     get_IMU()->begin();
     delay(100);
   }
-  
-  //Starting writing to SD card when ARMED 
+   //Starting writing to SD card when ARMED 
   if ((current_state >= ARMED) && (millis() - prevLogTime >= logEveryKMsec)) {
       prevLogTime = millis();
       write_SD(DATA_FILE, data, NUM_TYPES);
+  }
+
+  //Rocket disarmed, change state to IDLE
+  if (!digitalRead(ARM_BUTTON_PIN) && current_state==ARMED){
+    current_state = IDLE;
   }
 
   Serial.print("Current state: ");
@@ -157,5 +195,6 @@ void loop()
   Serial.print("Current barometer altitude: ");
   Serial.println(data[ALTITUDE]);
   */
+
   xbee.transmit();
 }

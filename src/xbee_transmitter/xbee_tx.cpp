@@ -27,13 +27,19 @@ void XBee::reset(void) {
 }
 
 void XBee::transmit(void) {
-    if(millis()-timer > TIMER_DELAY) {
-        Serial5.write('<');
-        Serial5.write((uint8_t*)&(++package_number), sizeof(package_number));
-        Serial5.write(sensors, num_sens_bytes);
-        Serial5.write('>');
-        timer = millis();
-    }
+   if(millis()-timer > TIMER_DELAY) {   
+       //Converting doubles to floats
+       float data[num_sens_bytes/sizeof(double)];
+       for (int i = 0; i < num_sens_bytes/sizeof(double); i++)
+          data[i] = (float)(((double*)(sensors))[i]);
+       
+       // Send one packet
+       Serial5.write('<');
+       Serial5.write((uint8_t*)&(++package_number), sizeof(package_number));
+       Serial5.write((uint8_t*)(data), num_sens_bytes/sizeof(double)*sizeof(float));
+       Serial5.write('>');
+       timer = millis();
+   }
 }
 
 
@@ -44,6 +50,3 @@ void XBee::sleep(void) {
 void XBee::wake_up(void) {
     digitalWrite(SLEEP_PIN, LOW);
 }
-
-
-

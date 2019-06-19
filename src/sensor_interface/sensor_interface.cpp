@@ -38,7 +38,7 @@ void calibrateAGL(){
       pitch = y axis
       yaw   = z axis
 */
-void readSensors(double *data){
+void readSensors(double *data, double *xbee_data){
   //Update BMP280 sensor data
   //Important to read temperature before reading pressure
   data[BME_TEMP] = Bme.readTempC();
@@ -110,6 +110,17 @@ void readSensors(double *data){
     data[GRAVITY_ACC_Y] = data[GRAVITY_ACC_Y]*-1;
     data[LINEAR_ACCEL_Y] = data[LINEAR_ACCEL_Y]*-1;
   }
+
+  xbee_data[0] = data[TIMESTAMP];
+  xbee_data[1] = data[ALTITUDE];
+  xbee_data[2] = data[ACC_X];
+  xbee_data[3] = data[ROLL];
+  xbee_data[4] = data[PITCH];
+  xbee_data[5] = data[YAW];
+  //xbee_data[6] = data[STATE]    %Set in flight_computer.ino
+  xbee_data[7] = data[LONGITUDE_GPS];
+  xbee_data[8] = data[LATITUDE_GPS];
+
 }
 
 /* This function is called every time new GPS-data is 
