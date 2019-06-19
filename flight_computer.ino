@@ -47,7 +47,7 @@ unsigned long prevLogTime;
 
 //Init data array
 const int FC_DATA_SIZE = 9;
-const int BT_DATA_SIZE = 6;
+const int BT_DATA_SIZE = NUMBER_OF_SENSORS;
 const int XBEE_DATA_SIZE = FC_DATA_SIZE + BT_DATA_SIZE;
 double payload_data[BT_DATA_SIZE];
 double xbee_data[XBEE_DATA_SIZE];
