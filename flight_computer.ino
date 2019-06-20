@@ -138,7 +138,7 @@ void setup()
   // Initialise servos
   init_servo(AIRBRAKES_SERVO, AIRBRAKES_SERVO_PIN, 800, 2200);
   init_servo(DROGUE_SERVO, DROGUE_SERVO_PIN, 800, 2200 );
-  init_servo(MAIN_SERVO, MAIN_SERVO_PIN, 800, 2200);
+  init_servo(MAIN_SERVO, MAIN_SERVO_PIN, 600, 2400);
 
   // Initialise and hold drogue and main chute positions throughout launch
   get_servo(DROGUE_SERVO)->write(DROGUE_RESET_ANGLE);

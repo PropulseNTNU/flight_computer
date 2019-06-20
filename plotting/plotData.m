@@ -1,4 +1,4 @@
-filename = 'DATAFILE.TXT';
+filename = 'DATA10.TXT';
 delimiterIn = ',';
 headerlinesIn = 0;
 data = importdata(filename,delimiterIn,headerlinesIn);
@@ -95,7 +95,7 @@ plot(timestamp/1000, IMU_temp);
 xlabel('seconds [s]');
 ylabel('deg celsius [°/C]');
 legend('BME Temperature','IMU Temperature');
-xlim([786,850]);
+%xlim([786,850]);
 title('Temperature');
 
 %Plot states

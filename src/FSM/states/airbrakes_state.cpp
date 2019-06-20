@@ -30,7 +30,7 @@ int airbrakes_state(double data[]) {
 	time_old = data[TIMESTAMP];
 
 	if(firstIter){
-		dt = 0.00014;
+		dt = 0.03;
 		firstIter = false;
 	}
 	else{
