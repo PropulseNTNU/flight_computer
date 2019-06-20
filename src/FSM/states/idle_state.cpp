@@ -1,10 +1,12 @@
 #include "../states.h"
+#include "../../sensor_interface/sensor_interface.h"
 
 //Only the arm button should trigger next state
 int idle_state(double data[]) {
 	return_code ret_code;
 
 	if (digitalRead(ARM_BUTTON_PIN)){
+		get_GPS()->stop();
 		ret_code = NEXT;
 	}
 	else {
