@@ -38,7 +38,8 @@ char* retriveMessageBle(){
     conn.stopListening();
     return buf;     
   }
-  //free(receivedMessage);
+  delay(50);
+  free(buf);
   return 0;
 }
 
@@ -51,11 +52,12 @@ void sendMessage(const char message){
 
 int messageFromPayload(double* data){
   char* message =  (retriveMessageBle());
+  free(retriveMessageBle());
   int index = 0;
   index = strlen(message);
   String messageID = "";
-  Serial.println("This msg is being handled: ");
-  Serial.println(message); 
+  //Serial.println("This msg is being handled: ");
+  //Serial.println(message); 
   if(index > 2){
     uint8_t messageIDFirstDigit = uint8_t(message[index-2])- 48; //ASCII fixing
     uint8_t messageIDSecondDigit = uint8_t(message[index-1]) - 48; //ASCII fixing
