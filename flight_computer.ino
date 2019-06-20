@@ -5,7 +5,7 @@
 #include "src/servo_interface/servo_interface.h"
 #include "src/sensor_interface/sensor_interface.h"
 #include "src/xbee_transmitter/xbee_tx.h"
-#include "src/bluetooth/bluetooth.h"
+//#include "src/bluetooth/bluetooth.h"
 
 /*
     Setup of adresses
@@ -47,7 +47,7 @@ unsigned long prevLogTime;
 
 //Init data array
 const int FC_DATA_SIZE = 9;
-const int BT_DATA_SIZE = NUMBER_OF_SENSORS;
+const int BT_DATA_SIZE = 0;//NUMBER_OF_SENSORS;
 const int XBEE_DATA_SIZE = FC_DATA_SIZE + BT_DATA_SIZE;
 double payload_data[BT_DATA_SIZE];
 double xbee_data[XBEE_DATA_SIZE];
@@ -118,7 +118,7 @@ void setup()
   //Calibrate BME pressure sensor to read 0m altitude at current location
   calibrateAGL();
 
-  Serial.println("Setup for recieving bluetooth communication");
+  /*Serial.println("Setup for recieving bluetooth communication");
   if (setupBle(payload_data, BT_DATA_SIZE))
   {
     Serial.println("Bluetooth setup done");
@@ -126,6 +126,7 @@ void setup()
   else {
     Serial.println("Bluetooth crashed");
   }
+  */
 
   //Setup ARM button pin
   pinMode(ARM_BUTTON_PIN, INPUT);
@@ -149,7 +150,7 @@ void loop()
 { 
   readSensors(data, xbee_data);
   
-  updateDataFromBle(payload_data);
+  //updateDataFromBle(payload_data);
   
   //for testing bluetooth data
   /*
@@ -162,10 +163,10 @@ void loop()
   */
   
   // Merge bluetooth into xbee_data
-  for (int i = FC_DATA_SIZE; i < XBEE_DATA_SIZE; i++){
+  /*for (int i = FC_DATA_SIZE; i < XBEE_DATA_SIZE; i++){
     xbee_data[i] = payload_data[i-FC_DATA_SIZE];
     }
-
+*/
   //Running the state machine
   state_function = state_funcs[current_state];
   
