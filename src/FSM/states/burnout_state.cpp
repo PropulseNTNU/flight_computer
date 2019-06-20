@@ -1,4 +1,5 @@
 #include "../states.h"
+#include "../../servo_interface/servo_interface.h"
 
 double last_data_x = 0;
 int increasing_count = 0; // add one to this count each time the rocket acc_x is increasing but negative
@@ -11,6 +12,8 @@ double launchTime = 0; // the time at launch(motor start)
 
 int burnout_state(double data[]){
 	return_code ret_code;
+
+	get_servo(AIRBRAKES_SERVO)->write(0);
 
 	//get the time at launch so we can estimate burnout time
 	if (launchTime == 0) {

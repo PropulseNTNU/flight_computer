@@ -143,6 +143,7 @@ void setup()
   // Initialise and hold drogue and main chute positions throughout launch
   get_servo(DROGUE_SERVO)->write(DROGUE_RESET_ANGLE);
   get_servo(MAIN_SERVO)->write(MAIN_RESET_ANGLE);
+  get_servo(AIRBRAKES_SERVO)->write(0);
 
 }
 
