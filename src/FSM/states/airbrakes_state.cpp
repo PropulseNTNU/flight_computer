@@ -12,24 +12,25 @@ float error = 0; //error used in controller
 float riemann_sum = 0; //used in integrator, witch is used in controller
 float u = 0;
 float dt = 0; //time step used in integrator and kalman filter
-ControlParameters parameters = { 1 , 0.01 , 1 }; //Control parameters (Kp, Ki, Kd)
+ControlParameters parameters = { 4 , 0.01 , 1 }; //Control parameters (Kp, Ki, Kd)
 unsigned long time_old = 0; // time variable for delta time
 
 float sensor_data[2]={0,0}; //Barometer at index 0 and accelrometer (z-direction)at index 1. Utvides kanskje senere m/pitch
 float estimates[2] = {0,0}; //Estimates from Kalman filter. [height, velocity]
 float reference_v = 0; //reference_velovity
 bool firstIter = true; // a boolean value so we know if we are in the first iteration. Used for handeling dt the first iteration.
-const int default_rotation = 30;
+const int default_rotation = 23.6; //40% effect
+double abValues[4] = {0,0,0,0};
 
 int airbrakes_state(double data[]) {
 	return_code ret_code;
-    
+
 	dt = (float)(data[TIMESTAMP] - time_old);
 	dt /= (float)1000; // converted to seconds
 	time_old = data[TIMESTAMP];
 
 	if(firstIter){
-		dt = 0.00014;
+		dt = 0.03;
 		firstIter = false;
 	}
 	else{
@@ -57,20 +58,23 @@ int airbrakes_state(double data[]) {
 
     // This updates the ApogeeArray with current altitude
     getAltitudeStruct()->updateDataArray(getAltitudeStruct(), (double)estimates[0]); //kalman_altitude == estimates[0]
-	
+
 	// write values from both airbrakes and recovery to SD card
 	if ((millis() - *getLastLog(COMMON_LASTLOG)) >= *getLogInterval(AIRBRAKES_INTERVAL)) {
 		setLastLog(millis(), COMMON_LASTLOG);
 		// these values may be nan during testing since the lookup table or sensors may be missing
-		double abValues[4] = {data[TIMESTAMP], estimates[0], estimates[1], u};
+		abValues[0] = data[TIMESTAMP];
+		abValues[1] = estimates[0];
+		abValues[2] = estimates[1];
+		abValues[3] = u;
 		write_SD(AIRBRAKES_FILE, abValues, 4);
         // writing recovery values
 		write_SD(RECOVERY_FILE, getApogee()->recoveryData, RECOVERY_DATA_LEN);
 	}
-	
+
     // Directly checks if average altitude falls below max altitude by a margin
 	if (apogeeDetected(getApogee(), data) && estimates[0] > 2000) {
-		get_servo(AIRBRAKES_SERVO)->write(0); 
+		get_servo(AIRBRAKES_SERVO)->write(0);
 		ret_code = NEXT;
 	}
 	else {
