@@ -1,4 +1,4 @@
-filename = 'DATA10.TXT';
+filename = 'DATA.TXT';
 delimiterIn = ',';
 headerlinesIn = 0;
 data = importdata(filename,delimiterIn,headerlinesIn);
