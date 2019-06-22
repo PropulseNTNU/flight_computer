@@ -67,6 +67,8 @@ void setup()
   Wire.begin();
 
   delay(500);
+
+
   
   Serial.println("Starting I2C communication with BME280");
   if (!get_BME()->beginI2C())
